@@ -1,0 +1,37 @@
+protocol:
+  subsystem: wheels
+  subsystem_id: 1
+  frames:
+    - name: WheelsStatusFrame
+      frame_id: 12
+      subsystem: wheels
+      fields:
+        - name: controller_id
+          type: uint8_t
+        - name: driver_status
+          type: uint8_t
+          health_checks:
+            - type: exact
+              value: 0
+              result: OK
+            - type: exact
+              value: 255
+              result: CRITICAL
+        - name: temperature
+          type: float
+          health_checks:
+            - type: range
+              min: 0
+              max: 100
+              result: OK
+            - type: range
+              min: 100
+              max: 200
+              result: WARNING
+            - type: range
+              min: 200
+              max: 300
+              result: CRITICAL
+        - name: algorithm_type
+          type: enum
+          values: [POSITION, VELOCITY, TORQUE]
