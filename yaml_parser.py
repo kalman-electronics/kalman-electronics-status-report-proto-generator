@@ -3,6 +3,8 @@ import os
 import yaml
 import c_generator as c_gen
 
+# TODO: iffdef guards
+# TODO: add health check functions
 
 class Protocol:
     def __init__(self, name: str):
@@ -17,7 +19,11 @@ class Protocol:
         for yaml_file in self.yaml_files:
             cw = c_gen.CCodeWriter()
             cw.add(c_gen.Include("stdint.h", brackets=True))
-            cw.add(c_gen.Include("kalman-status-report-protocol/common.h"))
+
+            custom_includes_group = c_gen.Group("Protocol Includes")
+            custom_includes_group.add(c_gen.Include("kalman-status-report-protocol/common.h"))
+            custom_includes_group.add(c_gen.Include("kalman-status-report-protocol/frames.h"))
+            cw.add(custom_includes_group)
             for frame in yaml_file['protocol']['frames']:
                 struct = c_gen.Struct(frame['name'], typedef=True, packed=True)
                 for field in frame['fields']:
@@ -51,7 +57,8 @@ class Protocol:
     #     dump_yaml(self.yaml_description, path)
 
     def save_c_code(self, path: str):
-        os.mkdir(path)
+        if not os.path.exists(path):
+            os.mkdir(path)
         for name, c_code in self.c_codes.items():
             with open(path + "/" + name + ".h", 'w') as f:
                 f.write(str(c_code))

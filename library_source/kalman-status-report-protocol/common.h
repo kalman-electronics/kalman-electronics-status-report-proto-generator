@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#define KALMAN_PROTOCOL_STATUS_REPORT_ID_BYTES 2
+
 typedef enum {
     OK,
     WARNING,
