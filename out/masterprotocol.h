@@ -1,6 +1,8 @@
 #include <stdint.h>
 
+// Protocol Includes
 #include "kalman-status-report-protocol/common.h"
+#include "kalman-status-report-protocol/frames.h"
 
 // Health check values for can_status
 #define can_status_HEALTH_CHECK_OK 0

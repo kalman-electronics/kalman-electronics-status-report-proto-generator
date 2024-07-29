@@ -1,6 +1,8 @@
 #include <stdint.h>
 
+// Protocol Includes
 #include "kalman-status-report-protocol/common.h"
+#include "kalman-status-report-protocol/frames.h"
 
 // Health check values for driver_status
 #define driver_status_HEALTH_CHECK_OK 0
@@ -26,3 +28,13 @@ typedef struct __attribute__((packed)) {
 	float temperature;
 	WheelsStatusFrame_AlgorithmTypeTypeDef algorithm_type;
 } WheelsStatusFrame;
+
+KalmanProtocol_StatusTypeDef WheelsStatusFrame_unpack(const RawDataFrame_TypeDef* raw_data, WheelsStatusFrame* frame) {
+    if (raw_data->data_length != sizeof(WheelsStatusFrame) + KALMAN_PROTOCOL_STATUS_REPORT_ID_BYTES) {
+        return KALMAN_PROTOCOL_STATUS_INVALID_FRAME_SIZE;
+    }
+
+
+
+    return KALMAN_PROTOCOL_STATUS_OK;
+}

@@ -1,0 +1,19 @@
+#ifndef KALMAN_PROTOCOL_STATUS_REPORT_FRAMES_H_
+#define KALMAN_PROTOCOL_STATUS_REPORT_FRAMES_H_
+
+#include <stdint.h>
+
+typedef struct {
+    uint8_t* data;
+    uint8_t length;
+} RawDataFrame_TypeDef;
+
+typedef enum {
+    KALMAN_PROTOCOL_STATUS_OK,
+    KALMAN_PROTOCOL_STATUS_INVALID_FRAME_SIZE,
+    KALMAN_PROTOCOL_STATUS_INVALID_FRAME_TYPE,
+
+    KALMAN_PROTOCOL_STATUS_ERROR
+} KalmanProtocol_StatusTypeDef;
+
+#endif // KALMAN_PROTOCOL_STATUS_REPORT_FRAMES_H_
