@@ -1,57 +1,121 @@
 import os
 
 import yaml
-import c_generator as c_gen
+from jinja2 import Environment, FileSystemLoader
 
-# TODO: iffdef guards
-# TODO: add health check functions
+ALLOWED_TYPES = {
+    'uint8_t': 1,
+    'uint16_t': 2,
+    'uint32_t': 4,
+    'uint64_t': 8,
+    'int8_t': 1,
+    'int16_t': 2,
+    'int32_t': 4,
+    'int64_t': 8,
+    'float': 4,
+    'double': 8,
+    'enum': 4,
+    'bool': 1,
+}
+
 
 class Protocol:
-    def __init__(self, name: str):
-        self.name = name
-        self.yaml_files = []
+    def __init__(self):
+        self.subsystem = None
+        self.subsystem_id = None
+        self.frames = []
+
+
+class Frame:
+    def __init__(self):
+        self.name = None
+        self.id = None
+        self.fields = []
+
+
+class Field:
+    def __init__(self):
+        self.name = None
+        self.type = None
+
+        self.values = []
+        self.health_checks = []
+
+        self.is_enum = False
+        self.is_health_check = False
+
+
+class HealthCheck:
+    def __init__(self):
+        self.type = None
+        self.value = None
+        self.min = None
+        self.max = None
+        self.result = None
+        self.troubleshoot = None
+        self.description = None
+
+
+class Parser:
+    def __init__(self):
+        self.protocols = {}
         self.c_codes = {}
 
     def load_from_yaml(self, path: str):
-        self.yaml_files.append(self.__load_yaml(path))
+        yaml_file = self.__load_yaml(path)
+        protocol = Protocol()
+        protocol.subsystem = yaml_file['protocol']['subsystem']
+        protocol.subsystem_id = yaml_file['protocol']['subsystem_id']
 
-    def generate_c_code(self):
-        for yaml_file in self.yaml_files:
-            cw = c_gen.CCodeWriter()
-            cw.add(c_gen.Include("stdint.h", brackets=True))
+        for frame in yaml_file['protocol']['frames']:
+            frame_obj = Frame()
+            frame_obj.name = frame['name']
+            frame_obj.id = frame['frame_id']
+            for field in frame['fields']:
+                field_obj = Field()
+                field_obj.name = field['name']
+                field_obj.type = field['type']
+                if field_obj.type == 'enum':
+                    field_obj.type = self.__to_camel_case(field_obj.name) + '_TypeDef'
+                    field_obj.values = field['values']
+                    field_obj.is_enum = True
 
-            custom_includes_group = c_gen.Group("Protocol Includes")
-            custom_includes_group.add(c_gen.Include("kalman-status-report-protocol/common.h"))
-            custom_includes_group.add(c_gen.Include("kalman-status-report-protocol/frames.h"))
-            cw.add(custom_includes_group)
-            for frame in yaml_file['protocol']['frames']:
-                struct = c_gen.Struct(frame['name'], typedef=True, packed=True)
-                for field in frame['fields']:
-                    type_name = field['type']
-                    if type_name == 'enum':
-                        type_name = frame['name'] + '_' + self.__to_camel_case(field['name']) + "TypeDef"
-                        enum = c_gen.Enum(type_name, typedef=True)
-                        for entry in field['values']:
-                            enum.add_entry(field['name'] + '_' + entry, uppercased=True)
-                        cw.add(enum)
+                if 'health_checks' in field:
+                    field_obj.is_health_check = True
+                    for health_check in field['health_checks']:
+                        health_check_obj = HealthCheck()
+                        health_check_obj.type = health_check['type']
 
-                    struct.add_field(c_gen.Field(type_name, field['name']))
+                        if health_check_obj.type == 'exact':
+                            health_check_obj.value = health_check['value']
+                        elif health_check_obj.type == 'range':
+                            health_check_obj.min = health_check['min']
+                            health_check_obj.max = health_check['max']
 
-                    if 'health_checks' in field:
-                        group = c_gen.Group("Health check values for " + field['name'])
-                        for entry in field['health_checks']:
-                            if entry['type'] == 'exact':
-                                group.add(c_gen.Define(field['name'] + '_HEALTH_CHECK_' + entry['result'], entry['value']))
-                            elif entry['type'] == 'range':
-                                group.add(c_gen.Define(field['name'] + '_HEALTH_CHECK_' + entry['result'] + '_MIN', entry['min']))
-                                group.add(c_gen.Define(field['name'] + '_HEALTH_CHECK_' + entry['result'] + '_MAX', entry['max']))
-                        cw.add(group)
+                        if 'result' in health_check:
+                            health_check_obj.result = health_check['result']
+                        if 'troubleshoot' in health_check:
+                            health_check_obj.troubleshoot = health_check['troubleshoot']
+                        if 'description' in health_check:
+                            health_check_obj.description = health_check['description']
 
-                        # TODO add health check function getters
+                        field_obj.health_checks.append(health_check_obj)
 
-                cw.add(struct)
+                frame_obj.fields.append(field_obj)
 
-            self.c_codes[yaml_file['protocol']['subsystem'] + "protocol"] = cw
+            protocol.frames.append(frame_obj)
+
+        self.protocols[protocol.subsystem + "_protocol"] = protocol
+
+    def generate_c_code(self, path: str):
+        for protocol_name, protocol in self.protocols.items():
+            jinja_env = Environment(loader=FileSystemLoader(path))
+            template = jinja_env.get_template('protocol_file_template.h.jinja2')
+            c_code = template.render(protocol=protocol,
+                                     clibraries=["stdint.h", "stdbool.h"],
+                                     libraries=["kalman-status-report-protocol/frames.h",
+                                                "kalman-status-report-protocol/common.h"])
+            self.c_codes[protocol_name] = c_code
 
     # def save_to_file(self, path: str):
     #     dump_yaml(self.yaml_description, path)
@@ -59,12 +123,10 @@ class Protocol:
     def save_c_code(self, path: str):
         if not os.path.exists(path):
             os.mkdir(path)
+
         for name, c_code in self.c_codes.items():
             with open(path + "/" + name + ".h", 'w') as f:
                 f.write(str(c_code))
-
-    def __str__(self):
-        return f"Protocol({self.name})"
 
     @staticmethod
     def __load_yaml(path: str):
@@ -72,15 +134,10 @@ class Protocol:
             return yaml.safe_load(file)
 
     @staticmethod
-    def __dump_yaml(self, data, path: str):
+    def __dump_yaml(data, path: str):
         with open(path, 'w') as file:
             yaml.dump(data, file)
 
     @staticmethod
     def __to_camel_case(snake_str):
         return "".join(x.capitalize() for x in snake_str.lower().split("_"))
-
-
-# a = load_yaml('protocol_description.yaml')
-#
-

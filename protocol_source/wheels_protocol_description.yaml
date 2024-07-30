@@ -2,7 +2,7 @@ protocol:
   subsystem: wheels
   subsystem_id: 1
   frames:
-    - name: WheelsStatusFrame
+    - name: WheelsStatus
       frame_id: 12
       subsystem: wheels
       fields:
@@ -35,3 +35,8 @@ protocol:
         - name: algorithm_type
           type: enum
           values: [POSITION, VELOCITY, TORQUE]
+        - name: algorithm_type2
+          type: enum
+          values: [ POSITION: 1, VELOCITY: 2, TORQUE: 3]
+        - name: testbool
+          type: bool

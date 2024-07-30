@@ -1,9 +1,8 @@
-
 protocol:
   subsystem: master
   subsystem_id: 2
   frames:
-    - name: MasterStatusFrame
+    - name: MasterStatus
       frame_id: 13
       subsystem: master
       fields:
@@ -16,9 +15,27 @@ protocol:
               description: "Fajen"
               troubleshoot: "Nic nie rób"
             - type: exact
+              value: 1
+              result: WARNING
+              description: "Zjebał się ueuos"
+            - type: exact
+              value: 2
+              result: WARNING
+              description: " Zjebał się uniwersal"
+            - type: exact
               value: 255
               result: CRITICAL
-    - name: DevicesAliveFrame
+            - type: exact
+              value: 255
+              result: CRITICAL
+            - type: exact
+              value: 255
+              result: CRITICAL
+            - type: exact
+              value: 255
+              result: CRITICAL
+
+    - name: DevicesAlive
       frame_id: 14
       subsystem: master
       fields:
