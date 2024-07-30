@@ -14,7 +14,7 @@ ALLOWED_TYPES = {
     'int64_t': 8,
     'float': 4,
     'double': 8,
-    'enum': 4,
+    'enum': 1,  # TODO: Decide if we want 1 byte enums encoding
     'bool': 1,
 }
 
@@ -37,12 +37,17 @@ class Field:
     def __init__(self):
         self.name = None
         self.type = None
+        self.cast_type = None
 
         self.values = []
         self.health_checks = []
 
         self.is_enum = False
         self.is_health_check = False
+        self.is_type_cast = False
+
+        self.offset = 0
+        self.actual_size = None
 
 
 class HealthCheck:
@@ -71,14 +76,34 @@ class Parser:
             frame_obj = Frame()
             frame_obj.name = frame['name']
             frame_obj.id = frame['frame_id']
+
+            current_offset = 0
+
             for field in frame['fields']:
                 field_obj = Field()
                 field_obj.name = field['name']
                 field_obj.type = field['type']
+                field_obj.offset = current_offset
+                if field_obj.type not in ALLOWED_TYPES:
+                    raise ValueError(f"Invalid type {field_obj.type} for field {field}")
+
+                if field_obj.type == 'bool':
+                    field_obj.cast_type = 'uint8_t'
+                    field_obj.is_type_cast = True
+
                 if field_obj.type == 'enum':
                     field_obj.type = self.__to_camel_case(field_obj.name) + '_TypeDef'
                     field_obj.values = field['values']
+                    field_obj.cast_type = 'uint8_t'
                     field_obj.is_enum = True
+                    field_obj.is_type_cast = True
+
+                if field_obj.is_type_cast:
+                    current_offset += ALLOWED_TYPES[field_obj.cast_type]
+                    field_obj.actual_size = ALLOWED_TYPES[field_obj.cast_type]
+                else:
+                    current_offset += ALLOWED_TYPES[field_obj.type]
+                    field_obj.actual_size = ALLOWED_TYPES[field_obj.type]
 
                 if 'health_checks' in field:
                     field_obj.is_health_check = True
@@ -114,7 +139,8 @@ class Parser:
             c_code = template.render(protocol=protocol,
                                      clibraries=["stdint.h", "stdbool.h"],
                                      libraries=["kalman-status-report-protocol/frames.h",
-                                                "kalman-status-report-protocol/common.h"])
+                                                "kalman-status-report-protocol/common.h"],
+                                     allowed_types=ALLOWED_TYPES)
             self.c_codes[protocol_name] = c_code
 
     # def save_to_file(self, path: str):

@@ -14,9 +14,11 @@ protocol:
             - type: exact
               value: 0
               result: OK
+              description: "Driver is ready"
             - type: exact
               value: 255
               result: CRITICAL
+              description: "Driver is not ready"
         - name: temperature
           type: float
           health_checks:
@@ -24,14 +26,17 @@ protocol:
               min: 0
               max: 100
               result: OK
+              description: "Temperature is normal"
             - type: range
               min: 100
               max: 200
               result: WARNING
+              description: "Temperature is high"
             - type: range
               min: 200
               max: 300
               result: CRITICAL
+              description: "Temperature is very high"
         - name: algorithm_type
           type: enum
           values: [POSITION, VELOCITY, TORQUE]
