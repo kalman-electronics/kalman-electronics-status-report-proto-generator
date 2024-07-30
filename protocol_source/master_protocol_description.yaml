@@ -17,20 +17,11 @@ protocol:
             - type: exact
               value: 1
               result: WARNING
-              description: "Zjebał się ueuos"
+              description: "Nie działa ueuos"
             - type: exact
               value: 2
               result: WARNING
-              description: " Zjebał się uniwersal"
-            - type: exact
-              value: 255
-              result: CRITICAL
-            - type: exact
-              value: 255
-              result: CRITICAL
-            - type: exact
-              value: 255
-              result: CRITICAL
+              description: " Nie działa uniwvrsal"
             - type: exact
               value: 255
               result: CRITICAL
@@ -50,6 +41,8 @@ protocol:
               min: 1
               max: 3
               result: WARNING
+              description: "Some wheels are not responding"
             - type: exact
               value: 4
               result: OK
+              description: "All wheels are alive"
