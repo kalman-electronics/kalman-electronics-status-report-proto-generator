@@ -1,8 +1,0 @@
-KalmanProtocol_StatusTypeDef {{ frame_name }}_unpack(const RawDataFrame_TypeDef* raw_data, {{ frame_name }} * frame) {
-    if (raw_data->data_length != sizeof({{ frame_name }}) + KALMAN_PROTOCOL_STATUS_REPORT_ID_BYTES) {
-        return KALMAN_PROTOCOL_STATUS_INVALID_FRAME_SIZE;
-    }
-
-
-    return KALMAN_PROTOCOL_STATUS_OK;
-}

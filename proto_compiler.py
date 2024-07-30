@@ -1,21 +1,24 @@
 import os
 import argparse
-from yaml_parser import Protocol
+from yaml_parser import Parser
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Generate C code from protocol description')
-    parser.add_help = True
-    parser.add_argument('source', type=str, help='Path to the directory containing the protocol description files ('
-                                                 'yaml)')
-    parser.add_argument('output', type=str, help='Path to the output directory')
-    args = parser.parse_args()
+    argument_parser = argparse.ArgumentParser(description='Generate C code from protocol description')
+    argument_parser.add_help = True
 
-    proto = Protocol('Kalman Status Report')
+    argument_parser.add_argument('-s', '--source', type=str,
+                                 help='Path to the directory containing the protocol description files (yaml)')
+    argument_parser.add_argument('-o', '--output', type=str, help='Path to the output directory')
+    argument_parser.add_argument('-t', '--templates', type=str, help='Path to the templates directory', default='templates',
+                                 required=False)
+
+    args = argument_parser.parse_args()
+
+    parser = Parser()
 
     for file in os.listdir(args.source):
-        proto.load_from_yaml(args.source + "/" + file)
+        parser.load_from_yaml(os.path.join(args.source, file))
 
-    proto.generate_c_code()
-
-    proto.save_c_code(args.output)
+    parser.generate_c_code(args.templates)
+    parser.save_c_code(args.output)
 

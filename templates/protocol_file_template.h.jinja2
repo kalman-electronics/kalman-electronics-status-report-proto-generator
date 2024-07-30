@@ -1,0 +1,77 @@
+#ifndef KALMAN_STATUS_REPORT_{{ protocol.subsystem | upper }}_H_
+#define KALMAN_STATUS_REPORT_{{ protocol.subsystem | upper }}_H_
+
+// Include the standard libraries
+{%- for clib in clibraries %}
+#include <{{ clib }}>
+{%- endfor %}
+
+// Include the user libraries
+{%- for lib in libraries %}
+#include "{{ lib }}"
+{%- endfor %}
+
+#define KALMAN_STATUS_REPORT_PROTOCOL_SUBSYSTEM_ID {{ protocol.subsystem_id }}
+
+{% for frame in protocol.frames -%}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// {{ frame.name }} Frame
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define KALMAN_STATUS_REPORT_{{ frame.name | upper }}_ID {{ frame.id }}
+{% for field in frame.fields if field.is_health_check  %}
+    {%- for health_check in field.health_checks %}
+        {%- if health_check.type == 'exact'%}
+#define KALMAN_STATUS_{{frame.name | upper}}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}} {{ health_check.value }}
+            {%- elif health_check.type == 'range'%}       
+#define KALMAN_STATUS_{{frame.name | upper}}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}_MIN {{ health_check.min }}
+#define KALMAN_STATUS_{{frame.name | upper}}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}_MAX {{ health_check.max }} 
+        {%- endif %}
+    {%- endfor %}
+{% endfor %}
+
+{%- for field in frame.fields %}
+{%- if field.is_enum %}
+typedef enum {
+    {%-for value in field.values %}
+        {%-if value is mapping %}
+    {{ field.name | upper ~ '_' ~ value | first }} = {{ value[value | first] }},
+        {%-else %}
+    {{ field.name | upper ~ '_' ~ value }},
+        {%-endif %}
+    {%-endfor %}
+} {{ field.type }};
+{%endif %}
+
+{%- endfor %}
+
+{%- set frame_type =  frame.name ~ '_FrameTypeDef' %}
+typedef struct __attribute__((packed)) {
+    {%- for field in frame.fields %}
+    {{ field.type }} {{ field.name }};
+    {%- endfor %}
+} {{ frame_type }};
+
+KalmanProtocol_StatusTypeDef {{ frame.name }}_unpack(const RawDataFrame_TypeDef* raw_data, {{ frame_type }}* frame) {
+    if (raw_data->length != sizeof({{ frame_type }}) + KALMAN_PROTOCOL_STATUS_REPORT_ID_BYTES) {
+        return KALMAN_PROTOCOL_STATUS_INVALID_FRAME_SIZE;
+    }
+
+    if (raw_data->data[0] != KALMAN_STATUS_REPORT_PROTOCOL_SUBSYSTEM_ID || raw_data->data[1] != KALMAN_STATUS_REPORT_{{ frame.name | upper }}_ID) {
+        return KALMAN_PROTOCOL_STATUS_INVALID_FRAME_TYPE;
+    }
+
+    {%- for field in frame.fields %}
+    {%- if field.is_enum %}
+    frame->{{ field.name }} = ({{ field.type }})raw_data->data[{{ loop.index0 + 2 }}];
+    {%- else %}
+    frame->{{ field.name }} = *(({{ field.type }}*)&raw_data->data[{{ loop.index0 + 2 }}]);
+    {%- endif %}
+    {%- endfor %}
+
+    return KALMAN_PROTOCOL_STATUS_OK;
+}
+
+{%endfor-%}
+
+#endif // KALMAN_STATUS_REPORT_{{ protocol.subsytem  | upper }}_H_
