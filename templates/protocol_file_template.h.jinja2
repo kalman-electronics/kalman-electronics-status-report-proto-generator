@@ -1,3 +1,7 @@
+{%- macro snake_to_camel(snake_case_str) -%}
+{{ snake_case_str |  replace('_', ' ') | title | replace('_', '') | replace(' ', '') }}
+{%- endmacro -%}
+
 #ifndef KALMAN_STATUS_REPORT_{{ protocol.subsystem | upper }}_H_
 #define KALMAN_STATUS_REPORT_{{ protocol.subsystem | upper }}_H_
 
@@ -20,14 +24,16 @@
 
 #define KALMAN_STATUS_REPORT_{{ frame.name | upper }}_ID {{ frame.id }}
 {% for field in frame.fields if field.is_health_check  %}
+typedef enum {
     {%- for health_check in field.health_checks %}
         {%- if health_check.type == 'exact'%}
-#define KALMAN_STATUS_{{frame.name | upper}}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}} {{ health_check.value }}
+    KALMAN_STATUS_{{frame.name | upper}}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}} = {{ health_check.value }},
             {%- elif health_check.type == 'range'%}       
-#define KALMAN_STATUS_{{frame.name | upper}}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}_MIN {{ health_check.min }}
-#define KALMAN_STATUS_{{frame.name | upper}}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}_MAX {{ health_check.max }} 
+    KALMAN_STATUS_{{frame.name | upper}}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}_MIN = {{ health_check.min }},
+    KALMAN_STATUS_{{frame.name | upper}}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}_MAX = {{ health_check.max }},
         {%- endif %}
     {%- endfor %}
+} {{ frame.name }}_{{ snake_to_camel(field.name) }}_HealthCheck_TypeDef;
 {% endfor %}
 
 {%- for field in frame.fields %}
