@@ -19,7 +19,7 @@ ALLOWED_TYPES = {
     'bool': 1,
 }
 
-
+#TODO
 class Protocol:
     def __init__(self):
         self.subsystem = None
