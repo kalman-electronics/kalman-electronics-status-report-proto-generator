@@ -9,13 +9,17 @@
 #include "kalman-status-report-protocol/frames.h"
 #include "kalman-status-report-protocol/common.h"
 
-#define KALMAN_STATUS_REPORT_PROTOCOL_SUBSYSTEM_ID 2
+#define KALMAN_STATUS_REPORT_MASTER_SUBSYSTEM_ID 2
+
+typedef enum {
+    KALMAN_STATUS_REPORT_MASTER_MASTERSTATUS_FRAME_ID = 13,
+    KALMAN_STATUS_REPORT_MASTER_DEVICESALIVE_FRAME_ID = 14,
+} KalmanStatusReport_Master_FrameID_TypeDef;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// MasterStatus Frame
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define KALMAN_STATUS_REPORT_MASTERSTATUS_ID 13
 
 typedef enum {
     KALMAN_STATUS_MASTERSTATUS_CAN_STATUS_HEALTH_CHECK_OK_1 = 0,
@@ -41,6 +45,7 @@ void MasterStatus_set_can_status(MasterStatus_FrameTypeDef* frame, uint8_t value
     frame->can_status = value;
 }
 
+
 ////////////////////////////////////////
 /// Getters
 ////////////////////////////////////////
@@ -49,39 +54,53 @@ uint8_t MasterStatus_get_can_status(const MasterStatus_FrameTypeDef* frame) {
     return frame->can_status;
 }
 
-KalmanProtocol_StatusTypeDef MasterStatus_unpack(const RawDataFrame_TypeDef* raw_data, MasterStatus_FrameTypeDef* frame) {
-    if (raw_data->length != sizeof(MasterStatus_FrameTypeDef) + KALMAN_PROTOCOL_STATUS_REPORT_ID_BYTES) {
-        return KALMAN_PROTOCOL_STATUS_INVALID_DATA_SIZE;
-    }
 
-    if (raw_data->data[0] != KALMAN_STATUS_REPORT_PROTOCOL_SUBSYSTEM_ID || raw_data->data[1] != KALMAN_STATUS_REPORT_MASTERSTATUS_ID) {
-        return KALMAN_PROTOCOL_STATUS_INVALID_FRAME_TYPE;
-    }
-    
-    frame->can_status = raw_data->data[0 + KALMAN_PROTOCOL_STATUS_REPORT_ID_BYTES];
+////////////////////////////////////////
+/// Frame Packing and Unpacking
+////////////////////////////////////////
+_nonnull_
+KalmanStatusReport_StatusTypeDef MasterStatus_init(MasterStatus_FrameTypeDef* frame) {
 
-    return KALMAN_PROTOCOL_STATUS_OK;
+    return KALMAN_STATUS_REPORT_OK;
 }
 
-KalmanProtocol_StatusTypeDef MasterStatus_pack(const MasterStatus_FrameTypeDef* frame, RawDataFrame_TypeDef* raw_data) {
-    if (raw_data->capacity < sizeof(MasterStatus_FrameTypeDef) + KALMAN_PROTOCOL_STATUS_REPORT_ID_BYTES) {
-        return KALMAN_PROTOCOL_STATUS_INVALID_DATA_SIZE;
+_nonnull_
+KalmanStatusReport_StatusTypeDef MasterStatus_unpack(const RawDataFrame_TypeDef* raw_data, MasterStatus_FrameTypeDef* frame) {
+    if (raw_data->length != sizeof(MasterStatus_FrameTypeDef) + KALMAN_STATUS_REPORT_ID_BYTES) {
+        return KALMAN_STATUS_REPORT_INVALID_DATA_SIZE;
     }
 
-    raw_data->data[0] = KALMAN_STATUS_REPORT_PROTOCOL_SUBSYSTEM_ID;
-    raw_data->data[1] = KALMAN_STATUS_REPORT_MASTERSTATUS_ID;
+    if (raw_data->data[0] != KALMAN_STATUS_REPORT_MASTER_SUBSYSTEM_ID ||
+        raw_data->data[1] != KALMAN_STATUS_REPORT_MASTER_MASTERSTATUS_FRAME_ID) {
+        return KALMAN_STATUS_REPORT_INVALID_FRAME_TYPE;
+    }
     
-    raw_data->data[0 + KALMAN_PROTOCOL_STATUS_REPORT_ID_BYTES] = frame->can_status;
+    frame->can_status = raw_data->data[0 + KALMAN_STATUS_REPORT_ID_BYTES];
 
-    raw_data->length = sizeof(MasterStatus_FrameTypeDef) + KALMAN_PROTOCOL_STATUS_REPORT_ID_BYTES;
+    return KALMAN_STATUS_REPORT_OK;
+}
 
-    return KALMAN_PROTOCOL_STATUS_OK;
+_nonnull_
+KalmanStatusReport_StatusTypeDef MasterStatus_pack(const MasterStatus_FrameTypeDef* frame, RawDataFrame_TypeDef* raw_data) {
+    if (raw_data->capacity < sizeof(MasterStatus_FrameTypeDef) + KALMAN_STATUS_REPORT_ID_BYTES) {
+        return KALMAN_STATUS_REPORT_INVALID_DATA_SIZE;
+    }
+
+    raw_data->data[0] = KALMAN_STATUS_REPORT_MASTER_SUBSYSTEM_ID;
+    raw_data->data[1] = KALMAN_STATUS_REPORT_MASTER_MASTERSTATUS_FRAME_ID;
+    
+    raw_data->data[0 + KALMAN_STATUS_REPORT_ID_BYTES] = frame->can_status;
+
+    raw_data->length = sizeof(MasterStatus_FrameTypeDef) + KALMAN_STATUS_REPORT_ID_BYTES;
+
+    return KALMAN_STATUS_REPORT_OK;
 }
 
 ////////////////////////////////////////
 /// Health Checks
 ////////////////////////////////////////
-StatusReportResult_TypeDef MasterStatus_CanStatus_HealthCheckResult(const MasterStatus_FrameTypeDef* frame) {
+_nonnull_
+KalmanStatusReport_StatusTypeDef MasterStatus_CanStatus_HealthCheckResult(const MasterStatus_FrameTypeDef* frame) {
     if (frame->can_status == KALMAN_STATUS_MASTERSTATUS_CAN_STATUS_HEALTH_CHECK_OK_1) {
         return OK;
     }
@@ -97,6 +116,7 @@ StatusReportResult_TypeDef MasterStatus_CanStatus_HealthCheckResult(const Master
     return UNKNOWN;
 }
 
+_nonnull_
 const char* MasterStatus_CanStatus_HealthCheckTroubleshoot(const MasterStatus_FrameTypeDef* frame) {
     if (frame->can_status == KALMAN_STATUS_MASTERSTATUS_CAN_STATUS_HEALTH_CHECK_OK_1) {
         return KALMAN_STATUS_MASTERSTATUS_CAN_STATUS_HEALTH_CHECK_OK_1_TROUBLESHOOT;
@@ -104,6 +124,7 @@ const char* MasterStatus_CanStatus_HealthCheckTroubleshoot(const MasterStatus_Fr
     return "Unknown troubleshoot";
 }
 
+_nonnull_
 const char* MasterStatus_CanStatus_HealthCheckDescription(const MasterStatus_FrameTypeDef* frame) {
     if (frame->can_status == KALMAN_STATUS_MASTERSTATUS_CAN_STATUS_HEALTH_CHECK_OK_1) {
         return KALMAN_STATUS_MASTERSTATUS_CAN_STATUS_HEALTH_CHECK_OK_1_DESCRIPTION;
@@ -120,7 +141,6 @@ const char* MasterStatus_CanStatus_HealthCheckDescription(const MasterStatus_Fra
 /// DevicesAlive Frame
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define KALMAN_STATUS_REPORT_DEVICESALIVE_ID 14
 
 typedef enum {
     KALMAN_STATUS_DEVICESALIVE_WHEELS_HEALTH_CHECK_CRITICAL_1 = 0,       
@@ -130,8 +150,8 @@ typedef enum {
 } DevicesAlive_Wheels_HealthCheck_TypeDef;
 
 #define KALMAN_STATUS_DEVICESALIVE_WHEELS_HEALTH_CHECK_CRITICAL_1_TROUBLESHOOT "Check CAN and power connection to wheels controllers"
-#define KALMAN_STATUS_DEVICESALIVE_WHEELS_HEALTH_CHECK_WARNING_1_DESCRIPTION "Some wheels are not responding"
-#define KALMAN_STATUS_DEVICESALIVE_WHEELS_HEALTH_CHECK_OK_2_DESCRIPTION "All wheels are alive"
+#define KALMAN_STATUS_DEVICESALIVE_WHEELS_HEALTH_CHECK_WARNING_2_DESCRIPTION "Some wheels are not responding"
+#define KALMAN_STATUS_DEVICESALIVE_WHEELS_HEALTH_CHECK_OK_3_DESCRIPTION "All wheels are alive"
 
 typedef struct _packed_ {
     uint8_t wheels;
@@ -145,6 +165,7 @@ void DevicesAlive_set_wheels(DevicesAlive_FrameTypeDef* frame, uint8_t value) {
     frame->wheels = value;
 }
 
+
 ////////////////////////////////////////
 /// Getters
 ////////////////////////////////////////
@@ -153,39 +174,53 @@ uint8_t DevicesAlive_get_wheels(const DevicesAlive_FrameTypeDef* frame) {
     return frame->wheels;
 }
 
-KalmanProtocol_StatusTypeDef DevicesAlive_unpack(const RawDataFrame_TypeDef* raw_data, DevicesAlive_FrameTypeDef* frame) {
-    if (raw_data->length != sizeof(DevicesAlive_FrameTypeDef) + KALMAN_PROTOCOL_STATUS_REPORT_ID_BYTES) {
-        return KALMAN_PROTOCOL_STATUS_INVALID_DATA_SIZE;
-    }
 
-    if (raw_data->data[0] != KALMAN_STATUS_REPORT_PROTOCOL_SUBSYSTEM_ID || raw_data->data[1] != KALMAN_STATUS_REPORT_DEVICESALIVE_ID) {
-        return KALMAN_PROTOCOL_STATUS_INVALID_FRAME_TYPE;
-    }
-    
-    frame->wheels = raw_data->data[0 + KALMAN_PROTOCOL_STATUS_REPORT_ID_BYTES];
+////////////////////////////////////////
+/// Frame Packing and Unpacking
+////////////////////////////////////////
+_nonnull_
+KalmanStatusReport_StatusTypeDef DevicesAlive_init(DevicesAlive_FrameTypeDef* frame) {
 
-    return KALMAN_PROTOCOL_STATUS_OK;
+    return KALMAN_STATUS_REPORT_OK;
 }
 
-KalmanProtocol_StatusTypeDef DevicesAlive_pack(const DevicesAlive_FrameTypeDef* frame, RawDataFrame_TypeDef* raw_data) {
-    if (raw_data->capacity < sizeof(DevicesAlive_FrameTypeDef) + KALMAN_PROTOCOL_STATUS_REPORT_ID_BYTES) {
-        return KALMAN_PROTOCOL_STATUS_INVALID_DATA_SIZE;
+_nonnull_
+KalmanStatusReport_StatusTypeDef DevicesAlive_unpack(const RawDataFrame_TypeDef* raw_data, DevicesAlive_FrameTypeDef* frame) {
+    if (raw_data->length != sizeof(DevicesAlive_FrameTypeDef) + KALMAN_STATUS_REPORT_ID_BYTES) {
+        return KALMAN_STATUS_REPORT_INVALID_DATA_SIZE;
     }
 
-    raw_data->data[0] = KALMAN_STATUS_REPORT_PROTOCOL_SUBSYSTEM_ID;
-    raw_data->data[1] = KALMAN_STATUS_REPORT_DEVICESALIVE_ID;
+    if (raw_data->data[0] != KALMAN_STATUS_REPORT_MASTER_SUBSYSTEM_ID ||
+        raw_data->data[1] != KALMAN_STATUS_REPORT_MASTER_DEVICESALIVE_FRAME_ID) {
+        return KALMAN_STATUS_REPORT_INVALID_FRAME_TYPE;
+    }
     
-    raw_data->data[0 + KALMAN_PROTOCOL_STATUS_REPORT_ID_BYTES] = frame->wheels;
+    frame->wheels = raw_data->data[0 + KALMAN_STATUS_REPORT_ID_BYTES];
 
-    raw_data->length = sizeof(DevicesAlive_FrameTypeDef) + KALMAN_PROTOCOL_STATUS_REPORT_ID_BYTES;
+    return KALMAN_STATUS_REPORT_OK;
+}
 
-    return KALMAN_PROTOCOL_STATUS_OK;
+_nonnull_
+KalmanStatusReport_StatusTypeDef DevicesAlive_pack(const DevicesAlive_FrameTypeDef* frame, RawDataFrame_TypeDef* raw_data) {
+    if (raw_data->capacity < sizeof(DevicesAlive_FrameTypeDef) + KALMAN_STATUS_REPORT_ID_BYTES) {
+        return KALMAN_STATUS_REPORT_INVALID_DATA_SIZE;
+    }
+
+    raw_data->data[0] = KALMAN_STATUS_REPORT_MASTER_SUBSYSTEM_ID;
+    raw_data->data[1] = KALMAN_STATUS_REPORT_MASTER_DEVICESALIVE_FRAME_ID;
+    
+    raw_data->data[0 + KALMAN_STATUS_REPORT_ID_BYTES] = frame->wheels;
+
+    raw_data->length = sizeof(DevicesAlive_FrameTypeDef) + KALMAN_STATUS_REPORT_ID_BYTES;
+
+    return KALMAN_STATUS_REPORT_OK;
 }
 
 ////////////////////////////////////////
 /// Health Checks
 ////////////////////////////////////////
-StatusReportResult_TypeDef DevicesAlive_Wheels_HealthCheckResult(const DevicesAlive_FrameTypeDef* frame) {
+_nonnull_
+KalmanStatusReport_StatusTypeDef DevicesAlive_Wheels_HealthCheckResult(const DevicesAlive_FrameTypeDef* frame) {
     if (frame->wheels == KALMAN_STATUS_DEVICESALIVE_WHEELS_HEALTH_CHECK_CRITICAL_1) {
         return CRITICAL;
     }
@@ -199,6 +234,7 @@ StatusReportResult_TypeDef DevicesAlive_Wheels_HealthCheckResult(const DevicesAl
     return UNKNOWN;
 }
 
+_nonnull_
 const char* DevicesAlive_Wheels_HealthCheckTroubleshoot(const DevicesAlive_FrameTypeDef* frame) {
     if (frame->wheels == KALMAN_STATUS_DEVICESALIVE_WHEELS_HEALTH_CHECK_CRITICAL_1) {
         return KALMAN_STATUS_DEVICESALIVE_WHEELS_HEALTH_CHECK_CRITICAL_1_TROUBLESHOOT;
@@ -206,9 +242,11 @@ const char* DevicesAlive_Wheels_HealthCheckTroubleshoot(const DevicesAlive_Frame
     return "Unknown troubleshoot";
 }
 
+_nonnull_
 const char* DevicesAlive_Wheels_HealthCheckDescription(const DevicesAlive_FrameTypeDef* frame) {
-    if (frame->wheels == KALMAN_STATUS_DEVICESALIVE_WHEELS_HEALTH_CHECK_WARNING_2) {
-        return KALMAN_STATUS_DEVICESALIVE_WHEELS_HEALTH_CHECK_WARNING_2_DESCRIPTION;
+    if (frame->wheels >= KALMAN_STATUS_DEVICESALIVE_WHEELS_HEALTH_CHECK_WARNING_2_MIN
+            && frame->wheels < KALMAN_STATUS_DEVICESALIVE_WHEELS_HEALTH_CHECK_WARNING_2_MAX) {
+        return KALMAN_STATUS_DEVICESALIVE_WHEELS_HEALTH_CHECK_WARNING_2_DESCRIPTION;    
     }
     if (frame->wheels == KALMAN_STATUS_DEVICESALIVE_WHEELS_HEALTH_CHECK_OK_3) {
         return KALMAN_STATUS_DEVICESALIVE_WHEELS_HEALTH_CHECK_OK_3_DESCRIPTION;

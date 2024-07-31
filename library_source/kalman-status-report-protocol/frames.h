@@ -5,12 +5,12 @@
 #include <string.h>
 
 typedef enum {
-    KALMAN_PROTOCOL_STATUS_OK,
-    KALMAN_PROTOCOL_STATUS_INVALID_DATA_SIZE,
-    KALMAN_PROTOCOL_STATUS_INVALID_FRAME_TYPE,
+    KALMAN_STATUS_REPORT_OK,
+    KALMAN_STATUS_REPORT_INVALID_DATA_SIZE,
+    KALMAN_STATUS_REPORT_INVALID_FRAME_TYPE,
 
-    KALMAN_PROTOCOL_STATUS_ERROR
-} KalmanProtocol_StatusTypeDef;
+    KALMAN_STATUS_REPORT_ERROR
+} KalmanStatusReport_StatusTypeDef;
 
 typedef struct {
     uint8_t* data;
@@ -24,13 +24,13 @@ void RawDataFrame_Init(RawDataFrame_TypeDef* raw_data, uint8_t* data, uint8_t ca
     raw_data->length = 0;
 }
 
-KalmanProtocol_StatusTypeDef RawDataFrame_Append(RawDataFrame_TypeDef* raw_data, uint8_t* bytes, uint8_t length) {
+KalmanStatusReport_StatusTypeDef RawDataFrame_Append(RawDataFrame_TypeDef* raw_data, uint8_t* bytes, uint8_t length) {
     if (raw_data->length + length < raw_data->capacity) {
         memcpy(&raw_data->data[raw_data->length], bytes, length);
 
-        return KALMAN_PROTOCOL_STATUS_OK;
+        return KALMAN_STATUS_REPORT_OK;
     } else {
-        return KALMAN_PROTOCOL_STATUS_INVALID_DATA_SIZE;
+        return KALMAN_STATUS_REPORT_INVALID_DATA_SIZE;
     }
 }
 

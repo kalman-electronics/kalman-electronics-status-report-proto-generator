@@ -15,14 +15,19 @@
 #include "{{ lib }}"
 {%- endfor %}
 
-#define KALMAN_STATUS_REPORT_PROTOCOL_SUBSYSTEM_ID {{ protocol.subsystem_id }}
+#define KALMAN_STATUS_REPORT_{{ protocol.subsystem | upper }}_SUBSYSTEM_ID {{ protocol.subsystem_id }}
+
+typedef enum {
+    {%- for frame in protocol.frames %}
+    KALMAN_STATUS_REPORT_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_FRAME_ID = {{ frame.id }},
+    {%- endfor %}
+} KalmanStatusReport_{{ snake_to_camel(protocol.subsystem) }}_FrameID_TypeDef;
 
 {% for frame in protocol.frames -%}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// {{ frame.name }} Frame
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define KALMAN_STATUS_REPORT_{{ frame.name | upper }}_ID {{ frame.id }}
 {% for field in frame.fields if field.is_health_check  %}
 typedef enum {
     {%- for health_check in field.health_checks %}
@@ -37,14 +42,18 @@ typedef enum {
 {% endfor %}
 
 {%- for field in frame.fields if field.is_health_check -%}
-    {%- for health_check in field.health_checks if health_check.troubleshoot != none %}
+    {%- for health_check in field.health_checks %}
+        {%-if health_check.troubleshoot != none%}
 #define KALMAN_STATUS_{{frame.name | upper}}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}_TROUBLESHOOT "{{ health_check.troubleshoot }}"
+        {%-endif%}
     {%- endfor %}
 {%- endfor %}
 
 {%- for field in frame.fields if field.is_health_check -%}
-    {%- for health_check in field.health_checks if health_check.description != none %}
+    {%- for health_check in field.health_checks %}
+        {%-if health_check.description != none %}
 #define KALMAN_STATUS_{{frame.name | upper}}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}_DESCRIPTION "{{health_check.description }}"
+        {%-endif %}
     {%- endfor %}
 {%- endfor %}
 {% for field in frame.fields %}
@@ -85,7 +94,7 @@ void {{ frame.name }}_set_{{ field.name }}({{ frame_type }}* frame, {{ field.typ
     frame->{{ field.name }} = value;
     {%- endif  %}
 }
-{%- endfor %}
+{% endfor %}
 
 ////////////////////////////////////////
 /// Getters
@@ -99,57 +108,70 @@ _nonnull_
     return frame->{{ field.name }};
 {%- endif  %}
 }
-{%- endfor %}
+{% endfor %}
 
-KalmanProtocol_StatusTypeDef {{ frame.name }}_unpack(const RawDataFrame_TypeDef* raw_data, {{ frame_type }}* frame) {
-    if (raw_data->length != sizeof({{ frame_type }}) + KALMAN_PROTOCOL_STATUS_REPORT_ID_BYTES) {
-        return KALMAN_PROTOCOL_STATUS_INVALID_DATA_SIZE;
-    }
+////////////////////////////////////////
+/// Frame Packing and Unpacking
+////////////////////////////////////////
+_nonnull_
+KalmanStatusReport_StatusTypeDef {{ frame.name }}_init({{ frame_type }}* frame) {
 
-    if (raw_data->data[0] != KALMAN_STATUS_REPORT_PROTOCOL_SUBSYSTEM_ID || raw_data->data[1] != KALMAN_STATUS_REPORT_{{ frame.name | upper }}_ID) {
-        return KALMAN_PROTOCOL_STATUS_INVALID_FRAME_TYPE;
-    }
-    {% for field in frame.fields %}
-
-        {%- if field.actual_size == 1 %}
-    frame->{{ field.name }} = raw_data->data[{{ field.offset }} + KALMAN_PROTOCOL_STATUS_REPORT_ID_BYTES];
-        {%- elif field.is_type_cast %}
-    frame->{{ field.name }} = *(({{ field.cast_type }}*)&raw_data->data[{{ field.offset }} + KALMAN_PROTOCOL_STATUS_REPORT_ID_BYTES]);
-        {%- else %}
-    frame->{{ field.name }} = *(({{ field.type }}*)&raw_data->data[{{ field.offset }} + KALMAN_PROTOCOL_STATUS_REPORT_ID_BYTES]);
-        {%- endif  %}
-    {%- endfor %}
-
-    return KALMAN_PROTOCOL_STATUS_OK;
+    return KALMAN_STATUS_REPORT_OK;
 }
 
-KalmanProtocol_StatusTypeDef {{ frame.name }}_pack(const {{ frame_type }}* frame, RawDataFrame_TypeDef* raw_data) {
-    if (raw_data->capacity < sizeof({{ frame_type }}) + KALMAN_PROTOCOL_STATUS_REPORT_ID_BYTES) {
-        return KALMAN_PROTOCOL_STATUS_INVALID_DATA_SIZE;
+_nonnull_
+KalmanStatusReport_StatusTypeDef {{ frame.name }}_unpack(const RawDataFrame_TypeDef* raw_data, {{ frame_type }}* frame) {
+    if (raw_data->length != sizeof({{ frame_type }}) + KALMAN_STATUS_REPORT_ID_BYTES) {
+        return KALMAN_STATUS_REPORT_INVALID_DATA_SIZE;
     }
 
-    raw_data->data[0] = KALMAN_STATUS_REPORT_PROTOCOL_SUBSYSTEM_ID;
-    raw_data->data[1] = KALMAN_STATUS_REPORT_{{ frame.name | upper }}_ID;
+    if (raw_data->data[0] != KALMAN_STATUS_REPORT_{{ protocol.subsystem | upper }}_SUBSYSTEM_ID ||
+        raw_data->data[1] != KALMAN_STATUS_REPORT_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_FRAME_ID) {
+        return KALMAN_STATUS_REPORT_INVALID_FRAME_TYPE;
+    }
     {% for field in frame.fields %}
+
         {%- if field.actual_size == 1 %}
-    raw_data->data[{{ field.offset }} + KALMAN_PROTOCOL_STATUS_REPORT_ID_BYTES] = frame->{{ field.name }};
+    frame->{{ field.name }} = raw_data->data[{{ field.offset }} + KALMAN_STATUS_REPORT_ID_BYTES];
         {%- elif field.is_type_cast %}
-    *(({{ field.cast_type }}*)&raw_data->data[{{ field.offset }} + KALMAN_PROTOCOL_STATUS_REPORT_ID_BYTES]) = frame->{{ field.name }};
+    frame->{{ field.name }} = *(({{ field.cast_type }}*)&raw_data->data[{{ field.offset }} + KALMAN_STATUS_REPORT_ID_BYTES]);
         {%- else %}
-    *(({{ field.type }}*)&raw_data->data[{{ field.offset }} + KALMAN_PROTOCOL_STATUS_REPORT_ID_BYTES]) = frame->{{ field.name }};
+    frame->{{ field.name }} = *(({{ field.type }}*)&raw_data->data[{{ field.offset }} + KALMAN_STATUS_REPORT_ID_BYTES]);
         {%- endif  %}
     {%- endfor %}
 
-    raw_data->length = sizeof({{ frame_type }}) + KALMAN_PROTOCOL_STATUS_REPORT_ID_BYTES;
+    return KALMAN_STATUS_REPORT_OK;
+}
 
-    return KALMAN_PROTOCOL_STATUS_OK;
+_nonnull_
+KalmanStatusReport_StatusTypeDef {{ frame.name }}_pack(const {{ frame_type }}* frame, RawDataFrame_TypeDef* raw_data) {
+    if (raw_data->capacity < sizeof({{ frame_type }}) + KALMAN_STATUS_REPORT_ID_BYTES) {
+        return KALMAN_STATUS_REPORT_INVALID_DATA_SIZE;
+    }
+
+    raw_data->data[0] = KALMAN_STATUS_REPORT_{{ protocol.subsystem | upper }}_SUBSYSTEM_ID;
+    raw_data->data[1] = KALMAN_STATUS_REPORT_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_FRAME_ID;
+    {% for field in frame.fields %}
+        {%- if field.actual_size == 1 %}
+    raw_data->data[{{ field.offset }} + KALMAN_STATUS_REPORT_ID_BYTES] = frame->{{ field.name }};
+        {%- elif field.is_type_cast %}
+    *(({{ field.cast_type }}*)&raw_data->data[{{ field.offset }} + KALMAN_STATUS_REPORT_ID_BYTES]) = frame->{{ field.name }};
+        {%- else %}
+    *(({{ field.type }}*)&raw_data->data[{{ field.offset }} + KALMAN_STATUS_REPORT_ID_BYTES]) = frame->{{ field.name }};
+        {%- endif  %}
+    {%- endfor %}
+
+    raw_data->length = sizeof({{ frame_type }}) + KALMAN_STATUS_REPORT_ID_BYTES;
+
+    return KALMAN_STATUS_REPORT_OK;
 }
 
 ////////////////////////////////////////
 /// Health Checks
 ////////////////////////////////////////
 {%- for field in frame.fields if field.is_health_check %}
-StatusReportResult_TypeDef {{ frame.name }}_{{ snake_to_camel(field.name) }}_HealthCheckResult(const {{ frame_type }}* frame) {
+_nonnull_
+KalmanStatusReport_StatusTypeDef {{ frame.name }}_{{ snake_to_camel(field.name) }}_HealthCheckResult(const {{ frame_type }}* frame) {
     {%- for health_check in field.health_checks %}
         {%- if health_check.type == 'exact' %}
     if (frame->{{ field.name }} == KALMAN_STATUS_{{frame.name | upper}}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}) {
@@ -167,12 +189,20 @@ StatusReportResult_TypeDef {{ frame.name }}_{{ snake_to_camel(field.name) }}_Hea
 {% endfor %}
 
 {%- for field in frame.fields if field.is_health_check %}
+_nonnull_
 const char* {{ frame.name }}_{{ snake_to_camel(field.name) }}_HealthCheckTroubleshoot(const {{ frame_type }}* frame) {
     {%- for health_check in field.health_checks %}
         {%- if health_check.troubleshoot != none %}
+            {%- if health_check.type == 'exact' %}
     if (frame->{{ field.name }} == KALMAN_STATUS_{{frame.name | upper}}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}) {
         return KALMAN_STATUS_{{frame.name | upper}}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}_TROUBLESHOOT;
     }
+            {%- elif health_check.type == 'range' %}
+    if (frame->{{ field.name }} >= KALMAN_STATUS_{{frame.name | upper}}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}_MIN
+            && frame->{{ field.name }} < KALMAN_STATUS_{{frame.name | upper}}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}_MAX) {
+        return KALMAN_STATUS_{{frame.name | upper}}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}_TROUBLESHOOT;    
+    }    
+            {%- endif %}
         {%- endif %}
     {%- endfor %}
     return "Unknown troubleshoot";
@@ -180,12 +210,20 @@ const char* {{ frame.name }}_{{ snake_to_camel(field.name) }}_HealthCheckTrouble
 {% endfor -%}
 
 {%- for field in frame.fields if field.is_health_check %}
+_nonnull_
 const char* {{ frame.name }}_{{ snake_to_camel(field.name) }}_HealthCheckDescription(const {{ frame_type }}* frame) {
     {%- for health_check in field.health_checks %}
         {%- if health_check.description != none %}
+            {%- if health_check.type == 'exact' %}
     if (frame->{{ field.name }} == KALMAN_STATUS_{{frame.name | upper}}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}) {
         return KALMAN_STATUS_{{frame.name | upper}}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}_DESCRIPTION;
     }
+            {%- elif health_check.type == 'range' %}
+    if (frame->{{ field.name }} >= KALMAN_STATUS_{{frame.name | upper}}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}_MIN
+            && frame->{{ field.name }} < KALMAN_STATUS_{{frame.name | upper}}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}_MAX) {
+        return KALMAN_STATUS_{{frame.name | upper}}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}_DESCRIPTION;    
+    }    
+            {%- endif %}
         {%- endif %}
     {%- endfor %}
     return "Unknown description";
@@ -194,4 +232,4 @@ const char* {{ frame.name }}_{{ snake_to_camel(field.name) }}_HealthCheckDescrip
 
 {% endfor %}
 
-#endif // KALMAN_STATUS_REPORT_{{ protocol.subsytem  | upper }}_H_
+#endif // KALMAN_STATUS_REPORT_{{ protocol.subsytem | upper }}_H_
