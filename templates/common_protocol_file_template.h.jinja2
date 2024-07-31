@@ -1,0 +1,18 @@
+#ifndef KALMAN_STATUS_REPORT_{{ protocol.subsystem | upper }}_H_
+#define KALMAN_STATUS_REPORT_{{ protocol.subsystem | upper }}_H_
+
+// Include all protocol libraries
+{%- for file_name in generated_files %}
+#include "{{ file_name }}"
+{%- endfor %}
+
+typedef enum {
+
+} KalmanStatusReport_SubsystemID_TypeDef;
+
+typedef struct {
+    KalmanStatusReport_SubsystemID_TypeDef subsystem_id;
+    uint32_t frame_id;
+} KalmanStatusReport_TypeID_TypeDef;
+
+#endif // KALMAN_STATUS_REPORT_{{ protocol.subsystem | upper }}_H_

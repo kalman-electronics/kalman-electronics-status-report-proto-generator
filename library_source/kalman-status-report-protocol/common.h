@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#define KALMAN_PROTOCOL_STATUS_REPORT_ID_BYTES 2
+#define KALMAN_STATUS_REPORT_ID_BYTES 2
 
 #define _packed_ __attribute__((packed))
 #define _nonnull_ __attribute__((nonnull))
