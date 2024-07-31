@@ -39,4 +39,5 @@ jobs:
     #     pytest
     - name: Generate protocol library
       run: |
-        python proto_compiler.py protocol_source out_protocol
+        ls -al
+        python proto_compiler.py -s protocol_source -o out_protocol
