@@ -41,6 +41,9 @@ jobs:
     - name: Generate protocol library
       run: |
         python proto_compiler.py -s protocol_source -o out_protocol
-    - name: list
-      run: |
-        ls -al
+        zip -r protocol.zip out_protocol
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: protocol.zip
