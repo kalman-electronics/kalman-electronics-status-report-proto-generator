@@ -41,3 +41,6 @@ jobs:
     - name: Generate protocol library
       run: |
         python proto_compiler.py -s protocol_source -o out_protocol
+    - name: list
+      run: |
+        ls -al
