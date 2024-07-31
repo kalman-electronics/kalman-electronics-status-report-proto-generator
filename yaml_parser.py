@@ -3,6 +3,7 @@ import os
 import yaml
 from jinja2 import Environment, FileSystemLoader
 
+
 ALLOWED_TYPES = {
     'uint8_t': 1,
     'uint16_t': 2,
