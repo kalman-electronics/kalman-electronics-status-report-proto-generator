@@ -5,7 +5,7 @@ name: Python application
 
 on:
   push:
-    branches: [ "dev", "master" ]  # TODO: change at final version
+    branches: [ "dev" ]  # TODO: change at final version
 #  pull_request:
 #    branches: [ "master" ]
 
