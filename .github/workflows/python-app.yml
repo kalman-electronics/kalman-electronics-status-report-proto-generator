@@ -40,5 +40,11 @@ jobs:
     #     pytest
     - name: Generate protocol library
       run: |
-        ls -al
         python proto_compiler.py -s protocol_source -o out_protocol
+        zip -r protocol.zip out_protocol
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@v2
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: protocol.zip
