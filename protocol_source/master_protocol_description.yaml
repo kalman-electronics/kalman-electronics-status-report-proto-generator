@@ -2,7 +2,7 @@ protocol:
   subsystem: master
   subsystem_id: 2
   frames:
-    - name: MasterStatus
+    - name: master_status
       frame_id: 13
       subsystem: master
       fields:
@@ -26,7 +26,7 @@ protocol:
               value: 255
               result: CRITICAL
 
-    - name: DevicesAlive
+    - name: devices_alive
       frame_id: 14
       subsystem: master
       fields:

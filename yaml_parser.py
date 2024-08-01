@@ -20,7 +20,6 @@ ALLOWED_TYPES = {
 }
 
 
-#TODO: adasdadasd
 class Protocol:
     def __init__(self):
         self.subsystem = None
@@ -65,8 +64,7 @@ class HealthCheck:
 
 class Parser:
     def __init__(self):
-        self.protocols = {}
-        self.c_codes = {}
+        self.__protocols = {}
 
     def load_from_yaml(self, path: str):
         yaml_file = self.__load_yaml(path)
@@ -94,7 +92,9 @@ class Parser:
                     field_obj.is_type_cast = True
 
                 if field_obj.type == 'enum':
-                    field_obj.type = self.__to_camel_case(field_obj.name) + '_TypeDef'
+                    field_obj.type = (f'KSRP_{self.__to_camel_case(protocol.subsystem)}_'
+                                      f'{self.__to_camel_case(frame_obj.name)}_'
+                                      f'{self.__to_camel_case(field_obj.name)}')
                     field_obj.values = field['values']
                     field_obj.cast_type = 'uint8_t'
                     field_obj.is_enum = True
@@ -132,29 +132,13 @@ class Parser:
 
             protocol.frames.append(frame_obj)
 
-        self.protocols[protocol.subsystem + "_protocol"] = protocol
+        self.__protocols[protocol.subsystem] = protocol
 
-    def generate_c_code(self, path: str):
-        for protocol_name, protocol in self.protocols.items():
-            jinja_env = Environment(loader=FileSystemLoader(path))
-            template = jinja_env.get_template('protocol_file_template.h.jinja2')
-            c_code = template.render(protocol=protocol,
-                                     clibraries=["stdint.h", "stdbool.h"],
-                                     libraries=["kalman-status-report-protocol/frames.h",
-                                                "kalman-status-report-protocol/common.h"],
-                                     allowed_types=ALLOWED_TYPES)
-            self.c_codes[protocol_name] = c_code
+    def get_protocols(self):
+        return self.__protocols
 
     # def save_to_file(self, path: str):
     #     dump_yaml(self.yaml_description, path)
-
-    def save_c_code(self, path: str):
-        if not os.path.exists(path):
-            os.mkdir(path)
-
-        for name, c_code in self.c_codes.items():
-            with open(path + "/" + name + ".h", 'w') as f:
-                f.write(str(c_code))
 
     @staticmethod
     def __load_yaml(path: str):

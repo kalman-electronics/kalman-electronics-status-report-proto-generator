@@ -1,0 +1,14 @@
+#ifndef KALMAN_STATUS_REPORT_UTIL_H_
+#define KALMAN_STATUS_REPORT_UTIL_H_
+
+// Include standard libraries
+{%- for clib in clibraries %}
+#include <{{ clib }}>
+{%- endfor %}
+
+// Include user libraries
+{%- for lib in libraries %}
+#include "{{ lib }}"
+{%- endfor %}
+
+#endif // KALMAN_STATUS_REPORT_UTIL_H_

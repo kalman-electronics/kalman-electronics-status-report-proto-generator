@@ -1,18 +1,28 @@
-#ifndef KALMAN_STATUS_REPORT_{{ protocol.subsystem | upper }}_H_
-#define KALMAN_STATUS_REPORT_{{ protocol.subsystem | upper }}_H_
+#ifndef KALMAN_STATUS_REPORT_COMMON_H_
+#define KALMAN_STATUS_REPORT_COMMON_H_
 
-// Include all protocol libraries
-{%- for file_name in generated_files %}
-#include "{{ file_name }}"
+// Include standard libraries
+{%- for clib in clibraries %}
+#include <{{ clib }}>
 {%- endfor %}
 
+// Include user libraries
+{%- for lib in libraries %}
+#include "{{ lib }}"
+{%- endfor %}
+
+// Enum for ID of each subsystem
+// ASSUMPTION: values won't exceed 255
 typedef enum {
+    {%- for protocol in protocols %}
+    KSRP_{{ protocol.subsystem | upper }}_SUBSYSTEM_ID = {{ protocol.subsystem_id }},
+    {%- endfor %}
+} KSRP_SubsystemID;
 
-} KalmanStatusReport_SubsystemID_TypeDef;
+typedef uint16_t KSRP_TypeID;
 
-typedef struct {
-    KalmanStatusReport_SubsystemID_TypeDef subsystem_id;
-    uint32_t frame_id;
-} KalmanStatusReport_TypeID_TypeDef;
+#define KSRP_MAKE_TYPE_ID(subsystem_id, type_id) ((subsystem_id << 8) | type_id)
+#define KSRP_GET_SUBSYSTEM_ID_FROM_TYPE_ID(type_id) (type_id >> 8)
+#define KSRP_GET_TYPE_ID_FROM_TYPE_ID(type_id) (type_id & 0xFF)
 
-#endif // KALMAN_STATUS_REPORT_{{ protocol.subsystem | upper }}_H_
+#endif // KALMAN_STATUS_REPORT_COMMON_H_

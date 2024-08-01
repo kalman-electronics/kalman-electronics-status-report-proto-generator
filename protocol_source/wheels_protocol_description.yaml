@@ -2,7 +2,7 @@ protocol:
   subsystem: wheels
   subsystem_id: 1
   frames:
-    - name: WheelsStatus
+    - name: wheels_status
       frame_id: 12
       subsystem: wheels
       fields:
