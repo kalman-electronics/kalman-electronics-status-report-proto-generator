@@ -11,4 +11,21 @@
 #include "{{ lib }}"
 {%- endfor %}
 
+KSRP_TypeID KSRP_VerifyTypeID(const KSRP_RawData_Frame* frame) {
+    if (frame->length < KSRP_ID_BYTES) {
+        return KSRP_ILLEGAL_TYPE_ID;
+    }
+
+    switch (KSRP_RawData_Frame_GetTypeID(frame)) {
+        {%- for protocol in protocols %}
+            {%- for frame in protocol.frames %}
+        case KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_TYPE_ID:
+            return KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_TYPE_ID;
+            {%- endfor  %}
+        {%- endfor %}
+    }
+
+    return KSRP_ILLEGAL_TYPE_ID;
+}
+
 #endif // KALMAN_STATUS_REPORT_UTIL_H_

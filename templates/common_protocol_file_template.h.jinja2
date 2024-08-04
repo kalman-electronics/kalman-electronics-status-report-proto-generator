@@ -19,10 +19,4 @@ typedef enum {
     {%- endfor %}
 } KSRP_SubsystemID;
 
-typedef uint16_t KSRP_TypeID;
-
-#define KSRP_MAKE_TYPE_ID(subsystem_id, type_id) ((subsystem_id << 8) | type_id)
-#define KSRP_GET_SUBSYSTEM_ID_FROM_TYPE_ID(type_id) (type_id >> 8)
-#define KSRP_GET_TYPE_ID_FROM_TYPE_ID(type_id) (type_id & 0xFF)
-
 #endif // KALMAN_STATUS_REPORT_COMMON_H_

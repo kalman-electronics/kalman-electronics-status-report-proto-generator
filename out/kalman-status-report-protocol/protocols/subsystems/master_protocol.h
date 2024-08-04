@@ -51,6 +51,12 @@ bool KSRP_IsRawDataInstanceof_Master_MasterStatus(const KSRP_RawData_Frame* raw_
         KSRP_IsTypeIDInstanceof_Master_MasterStatus(KSRP_MAKE_TYPE_ID(raw_data->data[0], raw_data->data[1]));
 }
 
+#define KSRP_MASTER_MASTER_STATUS_FRAME_SIZE sizeof(KSRP_Master_MasterStatus_Frame)
+
+typedef enum {
+    KSRP_MASTER_MASTER_STATUS_CAN_STATUS_FIELD_ID,
+} KSRP_Master_MasterStatus_FieldID;
+
 /////////////////////////////////////////////////////////////////////////////////
 /// MasterStatus Setters
 /////////////////////////////////////////////////////////////////////////////////
@@ -74,7 +80,6 @@ uint8_t KSRP_Get_Master_MasterStatus_CanStatus(const KSRP_Master_MasterStatus_Fr
 /////////////////////////////////////////////////////////////////////////////////
 _nonnull_
 KSRP_Status KSRP_Init_Master_MasterStatus(KSRP_Master_MasterStatus_Frame* frame) {
-
     return KSRP_STATUS_OK;
 }
 
@@ -98,7 +103,6 @@ KSRP_Status KSRP_Pack_Master_MasterStatus(const KSRP_Master_MasterStatus_Frame* 
     if (raw_data->capacity < sizeof(KSRP_Master_MasterStatus_Frame) + KSRP_ID_BYTES) {
         return KSRP_STATUS_INVALID_DATA_SIZE;
     }
-
     raw_data->data[0] = KSRP_MASTER_SUBSYSTEM_ID;
     raw_data->data[1] = KSRP_MASTER_MASTER_STATUS_FRAME_ID;
     
@@ -183,6 +187,12 @@ bool KSRP_IsRawDataInstanceof_Master_DevicesAlive(const KSRP_RawData_Frame* raw_
         KSRP_IsTypeIDInstanceof_Master_DevicesAlive(KSRP_MAKE_TYPE_ID(raw_data->data[0], raw_data->data[1]));
 }
 
+#define KSRP_MASTER_DEVICES_ALIVE_FRAME_SIZE sizeof(KSRP_Master_DevicesAlive_Frame)
+
+typedef enum {
+    KSRP_MASTER_DEVICES_ALIVE_WHEELS_FIELD_ID,
+} KSRP_Master_DevicesAlive_FieldID;
+
 /////////////////////////////////////////////////////////////////////////////////
 /// DevicesAlive Setters
 /////////////////////////////////////////////////////////////////////////////////
@@ -206,7 +216,6 @@ uint8_t KSRP_Get_Master_DevicesAlive_Wheels(const KSRP_Master_DevicesAlive_Frame
 /////////////////////////////////////////////////////////////////////////////////
 _nonnull_
 KSRP_Status KSRP_Init_Master_DevicesAlive(KSRP_Master_DevicesAlive_Frame* frame) {
-
     return KSRP_STATUS_OK;
 }
 
@@ -230,7 +239,6 @@ KSRP_Status KSRP_Pack_Master_DevicesAlive(const KSRP_Master_DevicesAlive_Frame* 
     if (raw_data->capacity < sizeof(KSRP_Master_DevicesAlive_Frame) + KSRP_ID_BYTES) {
         return KSRP_STATUS_INVALID_DATA_SIZE;
     }
-
     raw_data->data[0] = KSRP_MASTER_SUBSYSTEM_ID;
     raw_data->data[1] = KSRP_MASTER_DEVICES_ALIVE_FRAME_ID;
     

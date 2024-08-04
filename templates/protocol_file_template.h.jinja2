@@ -16,12 +16,11 @@
 
 // Enum for all frame IDs in given subsystem
 // ASSUMPTION: Values won't exceed 1 byte (255)
-{%- set frame_id_type = 'KSRP_' ~ snake_to_camel(protocol.subsystem) ~ '_FrameID' %}
 typedef enum {
     {%- for frame in protocol.frames %}
     KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_FRAME_ID = {{ frame.id }},
     {%- endfor %}
-} {{ frame_id_type }};
+} KSRP_{{ snake_to_camel(protocol.subsystem) }}_FrameID;
 
 {% for frame in protocol.frames -%}
 {%- set define_unique_id = protocol.subsystem | upper ~ '_' ~ frame.name | upper%}
@@ -96,6 +95,14 @@ bool KSRP_IsRawDataInstanceof_{{ frame_unique_id }}(const KSRP_RawData_Frame* ra
         KSRP_IsTypeIDInstanceof_{{ frame_unique_id }}(KSRP_MAKE_TYPE_ID(raw_data->data[0], raw_data->data[1]));
 }
 
+#define KSRP_{{ define_unique_id }}_FRAME_SIZE sizeof({{ frame_type }})
+
+typedef enum {
+    {%- for field in frame.fields %}
+    KSRP_{{ define_unique_id }}_{{ field.name | upper }}_FIELD_ID,
+    {%- endfor %}
+} KSRP_{{ frame_unique_id }}_FieldID;
+
 /////////////////////////////////////////////////////////////////////////////////
 /// {{ snake_to_camel(frame.name | upper) }} Setters
 /////////////////////////////////////////////////////////////////////////////////
@@ -129,7 +136,7 @@ _nonnull_
 /////////////////////////////////////////////////////////////////////////////////
 _nonnull_
 KSRP_Status KSRP_Init_{{ frame_unique_id }}({{ frame_type }}* frame) {
-
+{#- TODO: Initialization  #}
     return KSRP_STATUS_OK;
 }
 
@@ -142,6 +149,7 @@ KSRP_Status KSRP_Unpack_{{ frame_unique_id }}(const KSRP_RawData_Frame* raw_data
     if (!KSRP_IsRawDataInstanceof_{{ frame_unique_id }}(raw_data)) {
         return KSRP_STATUS_INVALID_FRAME_TYPE;
     }
+    {#- TODO: cast for 1-byte not being uint8_t  #}
     {% for field in frame.fields %}
         {%- if field.actual_size == 1 %}
     frame->{{ field.name }} = raw_data->data[{{ field.offset }} + KSRP_ID_BYTES];
@@ -161,6 +169,7 @@ KSRP_Status KSRP_Pack_{{ frame_unique_id }}(const {{ frame_type }}* frame, KSRP_
         return KSRP_STATUS_INVALID_DATA_SIZE;
     }
 
+{#- TODO: cast for 1-byte not being uint8_t  #}
     raw_data->data[0] = KSRP_{{ protocol.subsystem | upper }}_SUBSYSTEM_ID;
     raw_data->data[1] = KSRP_{{ define_unique_id }}_FRAME_ID;
     {% for field in frame.fields %}

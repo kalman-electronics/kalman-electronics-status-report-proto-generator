@@ -34,12 +34,28 @@ def generate_common_protocol(protocols):
     return {Path("protocols/protocol_common.h"): c_code}
 
 
-def generate_util_protocol(devices_protocols_file_paths):
+def generate_util_protocol(paths, protocols):
     jinja_env = Environment(loader=FileSystemLoader(args.templates))
     template = jinja_env.get_template('util_protocol_file_template.h.jinja2')
     c_code = template.render(clibraries=["stdint.h", "stdbool.h"],
-                             libraries=["kalman-status-report-protocol/" + path for path in devices_protocols_file_paths])
+                             libraries=["kalman-status-report-protocol/" + path for path in paths],
+                             protocols=protocols.values())
     return {Path("protocols/protocol_utils.h"): c_code}
+
+
+def generate_instances(protocols):
+    devices_instances_c_codes = {}
+    jinja_env = Environment(loader=FileSystemLoader(args.templates))
+    template = jinja_env.get_template('instance_file_template.h.jinja2')
+    for protocol_name, protocol in protocols.items():
+        c_code = template.render(protocol=protocol,
+                                clibraries=["stdint.h", "stdbool.h"],
+                                 libraries=["kalman-status-report-protocol/frames.h",
+                                            "kalman-status-report-protocol/common.h",
+                                            "kalman-status-report-protocol/protocols/subsystems/{protocol_name}_protocol.h"])
+        devices_instances_c_codes[f"instances/{protocol_name}_instance.h"] = c_code
+
+    return devices_instances_c_codes
 
 
 def save_c_codes(c_codes, path):
@@ -76,4 +92,5 @@ if __name__ == '__main__':
     output_path = os.path.join(args.output, 'kalman-status-report-protocol')
     save_c_codes(devices_protocols_c_codes, output_path)
     save_c_codes(generate_common_protocol(protocols.values()), output_path)
-    save_c_codes(generate_util_protocol(devices_protocols_c_codes.keys()), output_path)
+    save_c_codes(generate_util_protocol(devices_protocols_c_codes.keys(), protocols), output_path)
+    save_c_codes(generate_instances(protocols), output_path)

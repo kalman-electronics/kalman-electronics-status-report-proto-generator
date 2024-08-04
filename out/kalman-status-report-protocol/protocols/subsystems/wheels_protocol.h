@@ -75,6 +75,17 @@ bool KSRP_IsRawDataInstanceof_Wheels_WheelsStatus(const KSRP_RawData_Frame* raw_
         KSRP_IsTypeIDInstanceof_Wheels_WheelsStatus(KSRP_MAKE_TYPE_ID(raw_data->data[0], raw_data->data[1]));
 }
 
+#define KSRP_WHEELS_WHEELS_STATUS_FRAME_SIZE sizeof(KSRP_Wheels_WheelsStatus_Frame)
+
+typedef enum {
+    KSRP_WHEELS_WHEELS_STATUS_CONTROLLER_ID_FIELD_ID,
+    KSRP_WHEELS_WHEELS_STATUS_DRIVER_STATUS_FIELD_ID,
+    KSRP_WHEELS_WHEELS_STATUS_TEMPERATURE_FIELD_ID,
+    KSRP_WHEELS_WHEELS_STATUS_ALGORITHM_TYPE_FIELD_ID,
+    KSRP_WHEELS_WHEELS_STATUS_ALGORITHM_TYPE2_FIELD_ID,
+    KSRP_WHEELS_WHEELS_STATUS_TESTBOOL_FIELD_ID,
+} KSRP_Wheels_WheelsStatus_FieldID;
+
 /////////////////////////////////////////////////////////////////////////////////
 /// WheelsStatus Setters
 /////////////////////////////////////////////////////////////////////////////////
@@ -148,7 +159,6 @@ bool KSRP_Get_Wheels_WheelsStatus_Testbool(const KSRP_Wheels_WheelsStatus_Frame*
 /////////////////////////////////////////////////////////////////////////////////
 _nonnull_
 KSRP_Status KSRP_Init_Wheels_WheelsStatus(KSRP_Wheels_WheelsStatus_Frame* frame) {
-
     return KSRP_STATUS_OK;
 }
 
@@ -177,7 +187,6 @@ KSRP_Status KSRP_Pack_Wheels_WheelsStatus(const KSRP_Wheels_WheelsStatus_Frame* 
     if (raw_data->capacity < sizeof(KSRP_Wheels_WheelsStatus_Frame) + KSRP_ID_BYTES) {
         return KSRP_STATUS_INVALID_DATA_SIZE;
     }
-
     raw_data->data[0] = KSRP_WHEELS_SUBSYSTEM_ID;
     raw_data->data[1] = KSRP_WHEELS_WHEELS_STATUS_FRAME_ID;
     

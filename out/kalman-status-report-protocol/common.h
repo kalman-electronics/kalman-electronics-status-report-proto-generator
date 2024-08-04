@@ -8,7 +8,6 @@
 #define _packed_ __attribute__((packed))
 #define _nonnull_ __attribute__((nonnull))
 
-//TODO: ADD prefix to all enums
 typedef enum {
     KSRP_RESULT_OK,
     KSRP_RESULT_WARNING,
