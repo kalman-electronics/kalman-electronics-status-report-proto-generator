@@ -4,10 +4,13 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "common.h"
+
 typedef enum {
     KSRP_STATUS_OK,
     KSRP_STATUS_INVALID_DATA_SIZE,
     KSRP_STATUS_INVALID_FRAME_TYPE,
+    KSRP_STATUS_INVALID_FIELD_TYPE,
 
     KSRP_STATUS_ERROR
 } KSRP_Status;
@@ -43,7 +46,7 @@ KSRP_Status KSRP_RawDataFrame_Append(KSRP_RawData_Frame* raw_data, uint8_t* byte
 
 KSRP_TypeID KSRP_RawData_Frame_GetTypeID(const KSRP_RawData_Frame* raw_data) {
     if (raw_data->length < KSRP_ID_BYTES) {
-        return 0;
+        return KSRP_ILLEGAL_TYPE_ID;
     }
 
     return (raw_data->data[0] << 8) | raw_data->data[1];

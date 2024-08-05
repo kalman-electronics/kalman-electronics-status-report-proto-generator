@@ -8,7 +8,7 @@
 // Include user libraries
 #include "kalman-status-report-protocol/frames.h"
 #include "kalman-status-report-protocol/common.h"
-#include "kalman-status-report-protocol/protocols/subsystems/{protocol_name}_protocol.h"
+#include "kalman-status-report-protocol/protocols/subsystems/master_protocol.h"
 
 typedef struct {
     KSRP_Master_MasterStatus_Frame master_status_instance;
@@ -19,7 +19,7 @@ typedef struct {
 } KSRP_Master_Instance;
 
 _nonnull_
-KSRP_Status KSRP_Master_Instance_Init(KSRP_Master_StatusReport_Instance* instance) {
+KSRP_Status KSRP_Master_Instance_Init(KSRP_Master_Instance* instance) {
     // TODO: Initialize all the instances
     return KSRP_STATUS_OK;
 }
@@ -31,8 +31,8 @@ KSRP_Status KSRP_Master_Instance_UpdateFrame(
     void* frame, size_t frame_size) {
 
     switch(frame_id) {
-        case KSRP_Master_MasterStatus_FRAME_ID: {
-            if (frame_size != KSRP_Master_MasterStatus_FRAME_SIZE) {
+        case KSRP_MASTER_MASTER_STATUS_FRAME_ID: {
+            if (frame_size != KSRP_MASTER_MASTER_STATUS_FRAME_SIZE) {
                 return KSRP_STATUS_INVALID_DATA_SIZE;
             }
 
@@ -41,8 +41,8 @@ KSRP_Status KSRP_Master_Instance_UpdateFrame(
 
             break;
         }
-        case KSRP_Master_DevicesAlive_FRAME_ID: {
-            if (frame_size != KSRP_Master_DevicesAlive_FRAME_SIZE) {
+        case KSRP_MASTER_DEVICES_ALIVE_FRAME_ID: {
+            if (frame_size != KSRP_MASTER_DEVICES_ALIVE_FRAME_SIZE) {
                 return KSRP_STATUS_INVALID_DATA_SIZE;
             }
 
@@ -65,10 +65,10 @@ KSRP_Status KSRP_Master_Instance_UpdateFrameField(
     void* value, size_t value_size) {
 
     switch(frame_id) {
-        case KSRP_Master_MasterStatus_FRAME_ID:
+        case KSRP_MASTER_MASTER_STATUS_FRAME_ID:
             switch(field_id) {
                 case KSRP_MASTER_MASTER_STATUS_CAN_STATUS_FIELD_ID:
-                    if (value_size != sizeof(instance->master_status_instance.can_status) {
+                    if (value_size != sizeof(instance->master_status_instance.can_status)) {
                         return KSRP_STATUS_INVALID_DATA_SIZE;
                     }
 
@@ -79,10 +79,10 @@ KSRP_Status KSRP_Master_Instance_UpdateFrameField(
                 default:
                     return KSRP_STATUS_INVALID_FIELD_TYPE;
             }
-        case KSRP_Master_DevicesAlive_FRAME_ID:
+        case KSRP_MASTER_DEVICES_ALIVE_FRAME_ID:
             switch(field_id) {
                 case KSRP_MASTER_DEVICES_ALIVE_WHEELS_FIELD_ID:
-                    if (value_size != sizeof(instance->devices_alive_instance.wheels) {
+                    if (value_size != sizeof(instance->devices_alive_instance.wheels)) {
                         return KSRP_STATUS_INVALID_DATA_SIZE;
                     }
 

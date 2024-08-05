@@ -8,7 +8,7 @@
 // Include user libraries
 #include "kalman-status-report-protocol/frames.h"
 #include "kalman-status-report-protocol/common.h"
-#include "kalman-status-report-protocol/protocols/subsystems/{protocol_name}_protocol.h"
+#include "kalman-status-report-protocol/protocols/subsystems/wheels_protocol.h"
 
 typedef struct {
     KSRP_Wheels_WheelsStatus_Frame wheels_status_instance;
@@ -17,7 +17,7 @@ typedef struct {
 } KSRP_Wheels_Instance;
 
 _nonnull_
-KSRP_Status KSRP_Wheels_Instance_Init(KSRP_Wheels_StatusReport_Instance* instance) {
+KSRP_Status KSRP_Wheels_Instance_Init(KSRP_Wheels_Instance* instance) {
     // TODO: Initialize all the instances
     return KSRP_STATUS_OK;
 }
@@ -29,8 +29,8 @@ KSRP_Status KSRP_Wheels_Instance_UpdateFrame(
     void* frame, size_t frame_size) {
 
     switch(frame_id) {
-        case KSRP_Wheels_WheelsStatus_FRAME_ID: {
-            if (frame_size != KSRP_Wheels_WheelsStatus_FRAME_SIZE) {
+        case KSRP_WHEELS_WHEELS_STATUS_FRAME_ID: {
+            if (frame_size != KSRP_WHEELS_WHEELS_STATUS_FRAME_SIZE) {
                 return KSRP_STATUS_INVALID_DATA_SIZE;
             }
 
@@ -53,10 +53,10 @@ KSRP_Status KSRP_Wheels_Instance_UpdateFrameField(
     void* value, size_t value_size) {
 
     switch(frame_id) {
-        case KSRP_Wheels_WheelsStatus_FRAME_ID:
+        case KSRP_WHEELS_WHEELS_STATUS_FRAME_ID:
             switch(field_id) {
                 case KSRP_WHEELS_WHEELS_STATUS_CONTROLLER_ID_FIELD_ID:
-                    if (value_size != sizeof(instance->wheels_status_instance.controller_id) {
+                    if (value_size != sizeof(instance->wheels_status_instance.controller_id)) {
                         return KSRP_STATUS_INVALID_DATA_SIZE;
                     }
 
@@ -65,7 +65,7 @@ KSRP_Status KSRP_Wheels_Instance_UpdateFrameField(
 
                     break;
                 case KSRP_WHEELS_WHEELS_STATUS_DRIVER_STATUS_FIELD_ID:
-                    if (value_size != sizeof(instance->wheels_status_instance.driver_status) {
+                    if (value_size != sizeof(instance->wheels_status_instance.driver_status)) {
                         return KSRP_STATUS_INVALID_DATA_SIZE;
                     }
 
@@ -74,7 +74,7 @@ KSRP_Status KSRP_Wheels_Instance_UpdateFrameField(
 
                     break;
                 case KSRP_WHEELS_WHEELS_STATUS_TEMPERATURE_FIELD_ID:
-                    if (value_size != sizeof(instance->wheels_status_instance.temperature) {
+                    if (value_size != sizeof(instance->wheels_status_instance.temperature)) {
                         return KSRP_STATUS_INVALID_DATA_SIZE;
                     }
 
@@ -83,7 +83,7 @@ KSRP_Status KSRP_Wheels_Instance_UpdateFrameField(
 
                     break;
                 case KSRP_WHEELS_WHEELS_STATUS_ALGORITHM_TYPE_FIELD_ID:
-                    if (value_size != sizeof(instance->wheels_status_instance.algorithm_type) {
+                    if (value_size != sizeof(instance->wheels_status_instance.algorithm_type)) {
                         return KSRP_STATUS_INVALID_DATA_SIZE;
                     }
 
@@ -92,7 +92,7 @@ KSRP_Status KSRP_Wheels_Instance_UpdateFrameField(
 
                     break;
                 case KSRP_WHEELS_WHEELS_STATUS_ALGORITHM_TYPE2_FIELD_ID:
-                    if (value_size != sizeof(instance->wheels_status_instance.algorithm_type2) {
+                    if (value_size != sizeof(instance->wheels_status_instance.algorithm_type2)) {
                         return KSRP_STATUS_INVALID_DATA_SIZE;
                     }
 
@@ -101,7 +101,7 @@ KSRP_Status KSRP_Wheels_Instance_UpdateFrameField(
 
                     break;
                 case KSRP_WHEELS_WHEELS_STATUS_TESTBOOL_FIELD_ID:
-                    if (value_size != sizeof(instance->wheels_status_instance.testbool) {
+                    if (value_size != sizeof(instance->wheels_status_instance.testbool)) {
                         return KSRP_STATUS_INVALID_DATA_SIZE;
                     }
 

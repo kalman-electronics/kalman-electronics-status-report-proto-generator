@@ -24,7 +24,7 @@ typedef struct {
 } KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance;
 
 _nonnull_
-KSRP_Status KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance_Init(KSRP_{{ snake_to_camel(protocol.subsystem) }}_StatusReport_Instance* instance) {
+KSRP_Status KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance_Init(KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance* instance) {
     // TODO: Initialize all the instances
     return KSRP_STATUS_OK;
 }
@@ -37,8 +37,8 @@ KSRP_Status KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance_UpdateFrame(
 
     switch(frame_id) {
         {%- for frame in protocol.frames %}
-        case KSRP_{{ snake_to_camel(protocol.subsystem) }}_{{ snake_to_camel(frame.name | upper) }}_FRAME_ID: {
-            if (frame_size != KSRP_{{ snake_to_camel(protocol.subsystem) }}_{{ snake_to_camel(frame.name | upper) }}_FRAME_SIZE) {
+        case KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_FRAME_ID: {
+            if (frame_size != KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_FRAME_SIZE) {
                 return KSRP_STATUS_INVALID_DATA_SIZE;
             }
 
@@ -63,11 +63,11 @@ KSRP_Status KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance_UpdateFrameFi
 
     switch(frame_id) {
         {%- for frame in protocol.frames %}
-        case KSRP_{{ snake_to_camel(protocol.subsystem) }}_{{ snake_to_camel(frame.name | upper) }}_FRAME_ID:
+        case KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_FRAME_ID:
             switch(field_id) {
             {%- for field in frame.fields %}
                 case KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_{{ field.name | upper }}_FIELD_ID:
-                    if (value_size != sizeof(instance->{{ frame.name }}_instance.{{ field.name }}) {
+                    if (value_size != sizeof(instance->{{ frame.name }}_instance.{{ field.name }})) {
                         return KSRP_STATUS_INVALID_DATA_SIZE;
                     }
 

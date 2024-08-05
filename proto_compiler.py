@@ -52,7 +52,7 @@ def generate_instances(protocols):
                                 clibraries=["stdint.h", "stdbool.h"],
                                  libraries=["kalman-status-report-protocol/frames.h",
                                             "kalman-status-report-protocol/common.h",
-                                            "kalman-status-report-protocol/protocols/subsystems/{protocol_name}_protocol.h"])
+                                            f"kalman-status-report-protocol/protocols/subsystems/{protocol_name}_protocol.h"])
         devices_instances_c_codes[f"instances/{protocol_name}_instance.h"] = c_code
 
     return devices_instances_c_codes
