@@ -1,4 +1,7 @@
-#ifndef KALMAN_STATUS_REPORT_MASTER_INSTANCE_H_
+/**
+ * @file master_instance.h
+ * @brief Instance file for the master subsystem, containing structure managing subsystem's status
+ */#ifndef KALMAN_STATUS_REPORT_MASTER_INSTANCE_H_
 #define KALMAN_STATUS_REPORT_MASTER_INSTANCE_H_
 
 // Include standard libraries
@@ -10,8 +13,10 @@
 #include "kalman-status-report-protocol/common.h"
 #include "kalman-status-report-protocol/protocols/subsystems/master_protocol.h"
 
-//TODO: Subscription to frame updates (callbacks)
-//TODO: Docs
+//TODO: Subscription to frame updates (callbacks), and automatic frame sending
+/**
+ * @brief Instance structure for the master subsystem
+ */
 typedef struct {
     KSRP_Master_MasterStatus_Frame master_status_instance;
     KSRP_Master_DevicesAlive_Frame devices_alive_instance;
@@ -20,6 +25,13 @@ typedef struct {
     uint32_t devices_alive_ms_since_last_update;
 } KSRP_Master_Instance;
 
+/**
+ * @brief Initialize all frames in the instance
+ *
+ * @param instance The instance to initialize
+ * @return KSRP_Status The status of the initialization, KSRP_STATUS_OK if successful
+
+ */
 _nonnull_
 KSRP_Status KSRP_Init_Master_Instance(KSRP_Master_Instance* instance) {
     if (KSRP_Init_Master_MasterStatus_Frame(&instance->master_status_instance) != KSRP_STATUS_OK) {
@@ -31,6 +43,15 @@ KSRP_Status KSRP_Init_Master_Instance(KSRP_Master_Instance* instance) {
     return KSRP_STATUS_OK;
 }
 
+/**
+ * @brief Update a frame in the instance
+ *
+ * @param instance The instance to update
+ * @param frame_id The ID of the frame to update
+ * @param frame The new frame data
+ * @param frame_size The size of the new frame data
+ * @return KSRP_Status The status of the update, KSRP_STATUS_OK if successful
+ */
 _nonnull_
 KSRP_Status KSRP_UpdateFrame_Master_Instance(
     KSRP_Master_Instance* instance,
@@ -65,6 +86,16 @@ KSRP_Status KSRP_UpdateFrame_Master_Instance(
     return KSRP_STATUS_OK;
 }
 
+/**
+ * @brief Update a field in a frame in the instance
+ *
+ * @param instance The instance to update
+ * @param frame_id The ID of the frame to update
+ * @param field_id The ID of the field to update
+ * @param value The new field data
+ * @param value_size The size of the new field data
+ * @return KSRP_Status The status of the update, KSRP_STATUS_OK if successful
+ */
 _nonnull_
 KSRP_Status KSRP_UpdateFrameField_Master_Instance(
     KSRP_Master_Instance* instance,
@@ -106,6 +137,13 @@ KSRP_Status KSRP_UpdateFrameField_Master_Instance(
     return KSRP_STATUS_OK;
 }
 
+/**
+ * @brief Update the time since last update for all frames in the instance
+ *
+ * @param instance The instance to update
+ * @param ms_since_last_update Time delta since last update (in ms)
+ * @return KSRP_Status The status of the update, KSRP_STATUS_OK if successful
+ */
 _nonnull_
 KSRP_Status KSRP_UpdateTime_Master_Instance(
     KSRP_Master_Instance* instance, uint32_t ms_since_last_update) {
@@ -115,6 +153,13 @@ KSRP_Status KSRP_UpdateTime_Master_Instance(
     return KSRP_STATUS_OK;
 }
 
+/**
+ * @brief Get the time since last update for a frame in the instance
+ *
+ * @param instance The instance to get the time from
+ * @param frame_id The ID of the frame to get the time from
+ * @return uint32_t The time since the last update (in ms)
+ */
 _nonnull_
 uint32_t KSRP_Master_Instance_GetTimeSinceLastUpdate(
     KSRP_Master_Instance* instance, KSRP_Master_FrameID frame_id) {

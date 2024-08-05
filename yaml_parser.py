@@ -48,6 +48,8 @@ class Field:
         self.offset = 0
         self.actual_size = None
 
+        self.default = None
+
 
 class HealthCheck:
     def __init__(self):
@@ -109,6 +111,9 @@ class Parser:
                     field_obj.cast_type = 'uint8_t'
                     field_obj.is_enum = True
                     field_obj.is_type_cast = True
+
+                if 'default' in field:
+                    field_obj.default = field['default']
 
                 if field_obj.is_type_cast:
                     current_offset += ALLOWED_TYPES[field_obj.cast_type]

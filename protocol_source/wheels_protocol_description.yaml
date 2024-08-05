@@ -9,6 +9,7 @@ protocol:
       fields:
         - name: driver_status
           type: uint8_t
+          default: "15"
           health_checks:
             - type: exact
               value: 0
@@ -41,6 +42,8 @@ protocol:
           values: [POSITION, VELOCITY, TORQUE]
         - name: algorithm_type2
           type: enum
+          default: VELOCITY
           values: [ POSITION: 1, VELOCITY: 2, TORQUE: 3]
         - name: testbool
           type: bool
+          default: "true"
