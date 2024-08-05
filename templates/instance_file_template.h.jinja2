@@ -15,7 +15,7 @@
 {%- endfor %}
 
 //TODO: Subscription to frame updates (callbacks)
-
+//TODO: Docs
 typedef struct {
     {%- for frame in protocol.frames %}
     KSRP_{{ snake_to_camel(protocol.subsystem) }}_{{ snake_to_camel (frame.name | upper) }}_Frame {{ frame.name }}_instance;
