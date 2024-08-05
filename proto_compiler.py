@@ -49,7 +49,7 @@ def generate_instances(protocols):
     template = jinja_env.get_template('instance_file_template.h.jinja2')
     for protocol_name, protocol in protocols.items():
         c_code = template.render(protocol=protocol,
-                                clibraries=["stdint.h", "stdbool.h"],
+                                 clibraries=["stdint.h", "stdbool.h"],
                                  libraries=["kalman-status-report-protocol/frames.h",
                                             "kalman-status-report-protocol/common.h",
                                             f"kalman-status-report-protocol/protocols/subsystems/{protocol_name}_protocol.h"])

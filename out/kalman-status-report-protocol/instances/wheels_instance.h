@@ -59,12 +59,12 @@ KSRP_Status KSRP_UpdateFrameField_Wheels_Instance(
     switch(frame_id) {
         case KSRP_WHEELS_WHEELS_STATUS_FRAME_ID:
             switch(field_id) {
-                case KSRP_WHEELS_WHEELS_STATUS_CONTROLLER_ID_FIELD_ID:
-                    if (value_size != sizeof(instance->wheels_status_instance.controller_id)) {
+                case KSRP_WHEELS_WHEELS_STATUS_DEVICE_ID_FIELD_ID:
+                    if (value_size != sizeof(instance->wheels_status_instance.device_id)) {
                         return KSRP_STATUS_INVALID_DATA_SIZE;
                     }
 
-                    memcpy(&instance->wheels_status_instance.controller_id, value, value_size);
+                    memcpy(&instance->wheels_status_instance.device_id, value, value_size);
                     instance->wheels_status_ms_since_last_update = 0;
 
                     break;

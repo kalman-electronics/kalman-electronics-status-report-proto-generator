@@ -1,8 +1,5 @@
-import os
-
 import yaml
-from jinja2 import Environment, FileSystemLoader
-
+from unidecode import unidecode
 
 ALLOWED_TYPES = {
     'uint8_t': 1,
@@ -22,6 +19,7 @@ ALLOWED_TYPES = {
 
 class Protocol:
     def __init__(self):
+        self.multiple_devices = False
         self.subsystem = None
         self.subsystem_id = None
         self.frames = []
@@ -72,12 +70,24 @@ class Parser:
         protocol.subsystem = yaml_file['protocol']['subsystem']
         protocol.subsystem_id = yaml_file['protocol']['subsystem_id']
 
+        if 'multiple_devices' in yaml_file['protocol']:
+            protocol.multiple_devices = bool(yaml_file['protocol']['multiple_devices'])
+
         for frame in yaml_file['protocol']['frames']:
             frame_obj = Frame()
             frame_obj.name = frame['name']
             frame_obj.id = frame['frame_id']
 
             current_offset = 0
+
+            if protocol.multiple_devices:
+                device_id_field = Field()
+                device_id_field.type = 'uint8_t'
+                device_id_field.name = 'device_id'
+                device_id_field.offset = current_offset
+
+                frame_obj.fields.append(device_id_field)
+                current_offset += 1
 
             for field in frame['fields']:
                 field_obj = Field()
@@ -120,11 +130,11 @@ class Parser:
                             health_check_obj.max = health_check['max']
 
                         if 'result' in health_check:
-                            health_check_obj.result = health_check['result']
+                            health_check_obj.result = self.__normalize_string(health_check['result'])
                         if 'troubleshoot' in health_check:
-                            health_check_obj.troubleshoot = health_check['troubleshoot']
+                            health_check_obj.troubleshoot = self.__normalize_string(health_check['troubleshoot'])
                         if 'description' in health_check:
-                            health_check_obj.description = health_check['description']
+                            health_check_obj.description = self.__normalize_string(health_check['description'])
 
                         field_obj.health_checks.append(health_check_obj)
 
@@ -153,3 +163,7 @@ class Parser:
     @staticmethod
     def __to_camel_case(snake_str):
         return "".join(x.capitalize() for x in snake_str.lower().split("_"))
+
+    @staticmethod
+    def __normalize_string(text):
+        return str.strip(unidecode(text))

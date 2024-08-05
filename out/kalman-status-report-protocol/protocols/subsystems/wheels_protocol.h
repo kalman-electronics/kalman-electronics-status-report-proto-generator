@@ -54,7 +54,7 @@ typedef enum {
 } KSRP_Wheels_WheelsStatus_AlgorithmType2;
 
 typedef struct _packed_ {
-    uint8_t controller_id;
+    uint8_t device_id;
     uint8_t driver_status;
     float temperature;
     uint8_t algorithm_type;
@@ -78,7 +78,7 @@ bool KSRP_IsRawDataInstanceof_Wheels_WheelsStatus(const KSRP_RawData_Frame* raw_
 #define KSRP_WHEELS_WHEELS_STATUS_FRAME_SIZE sizeof(KSRP_Wheels_WheelsStatus_Frame)
 
 typedef enum {
-    KSRP_WHEELS_WHEELS_STATUS_CONTROLLER_ID_FIELD_ID,
+    KSRP_WHEELS_WHEELS_STATUS_DEVICE_ID_FIELD_ID,
     KSRP_WHEELS_WHEELS_STATUS_DRIVER_STATUS_FIELD_ID,
     KSRP_WHEELS_WHEELS_STATUS_TEMPERATURE_FIELD_ID,
     KSRP_WHEELS_WHEELS_STATUS_ALGORITHM_TYPE_FIELD_ID,
@@ -87,11 +87,61 @@ typedef enum {
 } KSRP_Wheels_WheelsStatus_FieldID;
 
 /////////////////////////////////////////////////////////////////////////////////
+/// WheelsStatus Frame Construction
+/////////////////////////////////////////////////////////////////////////////////
+_nonnull_
+KSRP_Status KSRP_Init_Wheels_WheelsStatus_Frame(KSRP_Wheels_WheelsStatus_Frame* frame) {
+    return KSRP_STATUS_OK;
+}
+
+_nonnull_
+KSRP_Status KSRP_Unpack_Wheels_WheelsStatus(const KSRP_RawData_Frame* raw_data, KSRP_Wheels_WheelsStatus_Frame* frame) {
+    if (raw_data->length != sizeof(KSRP_Wheels_WheelsStatus_Frame) + KSRP_ID_BYTES) {
+        return KSRP_STATUS_INVALID_DATA_SIZE;
+    }
+
+    if (!KSRP_IsRawDataInstanceof_Wheels_WheelsStatus(raw_data)) {
+        return KSRP_STATUS_INVALID_FRAME_TYPE;
+    }
+    
+    frame->device_id = *((uint8_t*)&raw_data->data[0 + KSRP_ID_BYTES]);
+    frame->driver_status = raw_data->data[1 + KSRP_ID_BYTES];
+    frame->temperature = *((float*)&raw_data->data[2 + KSRP_ID_BYTES]);
+    frame->algorithm_type = raw_data->data[6 + KSRP_ID_BYTES];
+    frame->algorithm_type2 = raw_data->data[7 + KSRP_ID_BYTES];
+    frame->testbool = raw_data->data[8 + KSRP_ID_BYTES];
+
+    return KSRP_STATUS_OK;
+}
+
+_nonnull_
+KSRP_Status KSRP_Pack_Wheels_WheelsStatus(const KSRP_Wheels_WheelsStatus_Frame* frame, KSRP_RawData_Frame* raw_data) {
+    if (raw_data->capacity < sizeof(KSRP_Wheels_WheelsStatus_Frame) + KSRP_ID_BYTES) {
+        return KSRP_STATUS_INVALID_DATA_SIZE;
+    }
+
+    raw_data->data[0] = KSRP_WHEELS_SUBSYSTEM_ID;
+    raw_data->data[1] = KSRP_WHEELS_WHEELS_STATUS_FRAME_ID;
+    
+    *((uint8_t*)&raw_data->data[0 + KSRP_ID_BYTES]) = frame->device_id;
+    raw_data->data[1 + KSRP_ID_BYTES] = frame->driver_status;
+    *((float*)&raw_data->data[2 + KSRP_ID_BYTES]) = frame->temperature;
+    raw_data->data[6 + KSRP_ID_BYTES] = frame->algorithm_type;
+    raw_data->data[7 + KSRP_ID_BYTES] = frame->algorithm_type2;
+    raw_data->data[8 + KSRP_ID_BYTES] = frame->testbool;
+
+    raw_data->length = sizeof(KSRP_Wheels_WheelsStatus_Frame) + KSRP_ID_BYTES;
+
+    return KSRP_STATUS_OK;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////
 /// WheelsStatus Setters
 /////////////////////////////////////////////////////////////////////////////////
 _nonnull_
-void KSRP_Set_Wheels_WheelsStatus_ControllerId(KSRP_Wheels_WheelsStatus_Frame* frame, uint8_t value) {
-    frame->controller_id = value;
+void KSRP_Set_Wheels_WheelsStatus_DeviceId(KSRP_Wheels_WheelsStatus_Frame* frame, uint8_t value) {
+    frame->device_id = value;
 }
 
 _nonnull_
@@ -124,8 +174,8 @@ void KSRP_Set_Wheels_WheelsStatus_Testbool(KSRP_Wheels_WheelsStatus_Frame* frame
 /// WheelsStatus Getters
 /////////////////////////////////////////////////////////////////////////////////
 _nonnull_
-uint8_t KSRP_Get_Wheels_WheelsStatus_ControllerId(const KSRP_Wheels_WheelsStatus_Frame* frame) {
-    return frame->controller_id;
+uint8_t KSRP_Get_Wheels_WheelsStatus_DeviceId(const KSRP_Wheels_WheelsStatus_Frame* frame) {
+    return frame->device_id;
 }
 
 _nonnull_
@@ -153,54 +203,6 @@ bool KSRP_Get_Wheels_WheelsStatus_Testbool(const KSRP_Wheels_WheelsStatus_Frame*
     return (bool)frame->testbool;
 }
 
-
-/////////////////////////////////////////////////////////////////////////////////
-/// WheelsStatus Frame Construction
-/////////////////////////////////////////////////////////////////////////////////
-_nonnull_
-KSRP_Status KSRP_Init_Wheels_WheelsStatus_Frame(KSRP_Wheels_WheelsStatus_Frame* frame) {
-    return KSRP_STATUS_OK;
-}
-
-_nonnull_
-KSRP_Status KSRP_Unpack_Wheels_WheelsStatus(const KSRP_RawData_Frame* raw_data, KSRP_Wheels_WheelsStatus_Frame* frame) {
-    if (raw_data->length != sizeof(KSRP_Wheels_WheelsStatus_Frame) + KSRP_ID_BYTES) {
-        return KSRP_STATUS_INVALID_DATA_SIZE;
-    }
-
-    if (!KSRP_IsRawDataInstanceof_Wheels_WheelsStatus(raw_data)) {
-        return KSRP_STATUS_INVALID_FRAME_TYPE;
-    }
-    
-    frame->controller_id = raw_data->data[0 + KSRP_ID_BYTES];
-    frame->driver_status = raw_data->data[1 + KSRP_ID_BYTES];
-    frame->temperature = *((float*)&raw_data->data[2 + KSRP_ID_BYTES]);
-    frame->algorithm_type = raw_data->data[6 + KSRP_ID_BYTES];
-    frame->algorithm_type2 = raw_data->data[7 + KSRP_ID_BYTES];
-    frame->testbool = raw_data->data[8 + KSRP_ID_BYTES];
-
-    return KSRP_STATUS_OK;
-}
-
-_nonnull_
-KSRP_Status KSRP_Pack_Wheels_WheelsStatus(const KSRP_Wheels_WheelsStatus_Frame* frame, KSRP_RawData_Frame* raw_data) {
-    if (raw_data->capacity < sizeof(KSRP_Wheels_WheelsStatus_Frame) + KSRP_ID_BYTES) {
-        return KSRP_STATUS_INVALID_DATA_SIZE;
-    }
-    raw_data->data[0] = KSRP_WHEELS_SUBSYSTEM_ID;
-    raw_data->data[1] = KSRP_WHEELS_WHEELS_STATUS_FRAME_ID;
-    
-    raw_data->data[0 + KSRP_ID_BYTES] = frame->controller_id;
-    raw_data->data[1 + KSRP_ID_BYTES] = frame->driver_status;
-    *((float*)&raw_data->data[2 + KSRP_ID_BYTES]) = frame->temperature;
-    raw_data->data[6 + KSRP_ID_BYTES] = frame->algorithm_type;
-    raw_data->data[7 + KSRP_ID_BYTES] = frame->algorithm_type2;
-    raw_data->data[8 + KSRP_ID_BYTES] = frame->testbool;
-
-    raw_data->length = sizeof(KSRP_Wheels_WheelsStatus_Frame) + KSRP_ID_BYTES;
-
-    return KSRP_STATUS_OK;
-}
 
 /////////////////////////////////////////////////////////////////////////////////
 /// WheelsStatus Health Checks

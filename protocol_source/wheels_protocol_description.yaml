@@ -1,13 +1,12 @@
 protocol:
   subsystem: wheels
   subsystem_id: 1
+  multiple_devices: true
   frames:
     - name: wheels_status
       frame_id: 12
       subsystem: wheels
       fields:
-        - name: controller_id
-          type: uint8_t
         - name: driver_status
           type: uint8_t
           health_checks:

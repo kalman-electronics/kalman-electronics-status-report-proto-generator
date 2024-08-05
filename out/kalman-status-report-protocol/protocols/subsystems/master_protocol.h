@@ -29,10 +29,10 @@ typedef enum {
     KSRP_MASTER_MASTER_STATUS_CAN_STATUS_HEALTH_CHECK_CRITICAL_4 = 255,
 } KSRP_Master_MasterStatus_CanStatus_HealthCheck;
 
-#define KSRP_MASTER_MASTER_STATUS_CAN_STATUS_HEALTH_CHECK_OK_1_TROUBLESHOOT "Nic nie rób"
+#define KSRP_MASTER_MASTER_STATUS_CAN_STATUS_HEALTH_CHECK_OK_1_TROUBLESHOOT "Nic nie rAlb"
 #define KSRP_MASTER_MASTER_STATUS_CAN_STATUS_HEALTH_CHECK_OK_1_DESCRIPTION "Fajen"
-#define KSRP_MASTER_MASTER_STATUS_CAN_STATUS_HEALTH_CHECK_WARNING_2_DESCRIPTION "Nie działa ueuos"
-#define KSRP_MASTER_MASTER_STATUS_CAN_STATUS_HEALTH_CHECK_WARNING_3_DESCRIPTION " Nie działa uniwvrsal"
+#define KSRP_MASTER_MASTER_STATUS_CAN_STATUS_HEALTH_CHECK_WARNING_2_DESCRIPTION "Nie dziaL,a ueuos"
+#define KSRP_MASTER_MASTER_STATUS_CAN_STATUS_HEALTH_CHECK_WARNING_3_DESCRIPTION "Nie dziaL,a uniwvrsal"
 
 typedef struct _packed_ {
     uint8_t can_status;
@@ -56,24 +56,6 @@ bool KSRP_IsRawDataInstanceof_Master_MasterStatus(const KSRP_RawData_Frame* raw_
 typedef enum {
     KSRP_MASTER_MASTER_STATUS_CAN_STATUS_FIELD_ID,
 } KSRP_Master_MasterStatus_FieldID;
-
-/////////////////////////////////////////////////////////////////////////////////
-/// MasterStatus Setters
-/////////////////////////////////////////////////////////////////////////////////
-_nonnull_
-void KSRP_Set_Master_MasterStatus_CanStatus(KSRP_Master_MasterStatus_Frame* frame, uint8_t value) {
-    frame->can_status = value;
-}
-
-
-/////////////////////////////////////////////////////////////////////////////////
-/// MasterStatus Getters
-/////////////////////////////////////////////////////////////////////////////////
-_nonnull_
-uint8_t KSRP_Get_Master_MasterStatus_CanStatus(const KSRP_Master_MasterStatus_Frame* frame) {
-    return frame->can_status;
-}
-
 
 /////////////////////////////////////////////////////////////////////////////////
 /// MasterStatus Frame Construction
@@ -103,6 +85,7 @@ KSRP_Status KSRP_Pack_Master_MasterStatus(const KSRP_Master_MasterStatus_Frame* 
     if (raw_data->capacity < sizeof(KSRP_Master_MasterStatus_Frame) + KSRP_ID_BYTES) {
         return KSRP_STATUS_INVALID_DATA_SIZE;
     }
+
     raw_data->data[0] = KSRP_MASTER_SUBSYSTEM_ID;
     raw_data->data[1] = KSRP_MASTER_MASTER_STATUS_FRAME_ID;
     
@@ -112,6 +95,25 @@ KSRP_Status KSRP_Pack_Master_MasterStatus(const KSRP_Master_MasterStatus_Frame* 
 
     return KSRP_STATUS_OK;
 }
+
+
+/////////////////////////////////////////////////////////////////////////////////
+/// MasterStatus Setters
+/////////////////////////////////////////////////////////////////////////////////
+_nonnull_
+void KSRP_Set_Master_MasterStatus_CanStatus(KSRP_Master_MasterStatus_Frame* frame, uint8_t value) {
+    frame->can_status = value;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////
+/// MasterStatus Getters
+/////////////////////////////////////////////////////////////////////////////////
+_nonnull_
+uint8_t KSRP_Get_Master_MasterStatus_CanStatus(const KSRP_Master_MasterStatus_Frame* frame) {
+    return frame->can_status;
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////
 /// MasterStatus Health Checks
@@ -194,24 +196,6 @@ typedef enum {
 } KSRP_Master_DevicesAlive_FieldID;
 
 /////////////////////////////////////////////////////////////////////////////////
-/// DevicesAlive Setters
-/////////////////////////////////////////////////////////////////////////////////
-_nonnull_
-void KSRP_Set_Master_DevicesAlive_Wheels(KSRP_Master_DevicesAlive_Frame* frame, uint8_t value) {
-    frame->wheels = value;
-}
-
-
-/////////////////////////////////////////////////////////////////////////////////
-/// DevicesAlive Getters
-/////////////////////////////////////////////////////////////////////////////////
-_nonnull_
-uint8_t KSRP_Get_Master_DevicesAlive_Wheels(const KSRP_Master_DevicesAlive_Frame* frame) {
-    return frame->wheels;
-}
-
-
-/////////////////////////////////////////////////////////////////////////////////
 /// DevicesAlive Frame Construction
 /////////////////////////////////////////////////////////////////////////////////
 _nonnull_
@@ -239,6 +223,7 @@ KSRP_Status KSRP_Pack_Master_DevicesAlive(const KSRP_Master_DevicesAlive_Frame* 
     if (raw_data->capacity < sizeof(KSRP_Master_DevicesAlive_Frame) + KSRP_ID_BYTES) {
         return KSRP_STATUS_INVALID_DATA_SIZE;
     }
+
     raw_data->data[0] = KSRP_MASTER_SUBSYSTEM_ID;
     raw_data->data[1] = KSRP_MASTER_DEVICES_ALIVE_FRAME_ID;
     
@@ -248,6 +233,25 @@ KSRP_Status KSRP_Pack_Master_DevicesAlive(const KSRP_Master_DevicesAlive_Frame* 
 
     return KSRP_STATUS_OK;
 }
+
+
+/////////////////////////////////////////////////////////////////////////////////
+/// DevicesAlive Setters
+/////////////////////////////////////////////////////////////////////////////////
+_nonnull_
+void KSRP_Set_Master_DevicesAlive_Wheels(KSRP_Master_DevicesAlive_Frame* frame, uint8_t value) {
+    frame->wheels = value;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////
+/// DevicesAlive Getters
+/////////////////////////////////////////////////////////////////////////////////
+_nonnull_
+uint8_t KSRP_Get_Master_DevicesAlive_Wheels(const KSRP_Master_DevicesAlive_Frame* frame) {
+    return frame->wheels;
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////
 /// DevicesAlive Health Checks

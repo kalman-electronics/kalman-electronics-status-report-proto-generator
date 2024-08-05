@@ -104,6 +104,69 @@ typedef enum {
 } KSRP_{{ frame_unique_id }}_FieldID;
 
 /////////////////////////////////////////////////////////////////////////////////
+/// {{ snake_to_camel(frame.name | upper) }} Frame Construction
+/////////////////////////////////////////////////////////////////////////////////
+_nonnull_
+KSRP_Status KSRP_Init_{{ frame_unique_id }}_Frame({{ frame_type }}* frame) {
+    {#- TODO: Initialization  #}
+    return KSRP_STATUS_OK;
+}
+
+_nonnull_
+KSRP_Status KSRP_Unpack_{{ frame_unique_id }}(const KSRP_RawData_Frame* raw_data, {{ frame_type }}* frame) {
+    if (raw_data->length != sizeof({{ frame_type }}) + KSRP_ID_BYTES) {
+        return KSRP_STATUS_INVALID_DATA_SIZE;
+    }
+
+    if (!KSRP_IsRawDataInstanceof_{{ frame_unique_id }}(raw_data)) {
+        return KSRP_STATUS_INVALID_FRAME_TYPE;
+    }
+    {% for field in frame.fields %}
+        {%- if field.actual_size == 1 %}
+            {%- if (field.is_type_cast and field.cast_type != 'uint8_t') or (not field.is_type_cast and field.type != 'uint8_t' ) %}
+    frame->{{ field.name }} = ({{ field.type }})raw_data->data[{{ field.offset }} + KSRP_ID_BYTES];
+            {%- else %}
+    frame->{{ field.name }} = raw_data->data[{{ field.offset }} + KSRP_ID_BYTES];
+            {%- endif %}
+        {%- elif field.is_type_cast %}
+    frame->{{ field.name }} = *(({{ field.cast_type }}*)&raw_data->data[{{ field.offset }} + KSRP_ID_BYTES]);
+        {%- else %}
+    frame->{{ field.name }} = *(({{ field.type }}*)&raw_data->data[{{ field.offset }} + KSRP_ID_BYTES]);
+        {%- endif  %}
+    {%- endfor %}
+
+    return KSRP_STATUS_OK;
+}
+
+_nonnull_
+KSRP_Status KSRP_Pack_{{ frame_unique_id }}(const {{ frame_type }}* frame, KSRP_RawData_Frame* raw_data) {
+    if (raw_data->capacity < sizeof({{ frame_type }}) + KSRP_ID_BYTES) {
+        return KSRP_STATUS_INVALID_DATA_SIZE;
+    }
+
+    raw_data->data[0] = KSRP_{{ protocol.subsystem | upper }}_SUBSYSTEM_ID;
+    raw_data->data[1] = KSRP_{{ define_unique_id }}_FRAME_ID;
+    {% for field in frame.fields %}
+        {%- if field.actual_size == 1 %}
+            {%- if (field.is_type_cast and field.cast_type != 'uint8_t') or (not field.is_type_cast and field.type != 'uint8_t' ) %}
+    raw_data->data[{{ field.offset }} + KSRP_ID_BYTES] = (uint8_t)frame->{{ field.name }};
+            {%- else %}
+    raw_data->data[{{ field.offset }} + KSRP_ID_BYTES] = frame->{{ field.name }};
+            {%- endif %}
+        {%- elif field.is_type_cast %}
+    *(({{ field.cast_type }}*)&raw_data->data[{{ field.offset }} + KSRP_ID_BYTES]) = frame->{{ field.name }};
+        {%- else %}
+    *(({{ field.type }}*)&raw_data->data[{{ field.offset }} + KSRP_ID_BYTES]) = frame->{{ field.name }};
+        {%- endif  %}
+    {%- endfor %}
+
+    raw_data->length = sizeof({{ frame_type }}) + KSRP_ID_BYTES;
+
+    return KSRP_STATUS_OK;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////
 /// {{ snake_to_camel(frame.name | upper) }} Setters
 /////////////////////////////////////////////////////////////////////////////////
 {%- for field in frame.fields %}
@@ -130,62 +193,6 @@ _nonnull_
 {%- endif  %}
 }
 {% endfor %}
-
-/////////////////////////////////////////////////////////////////////////////////
-/// {{ snake_to_camel(frame.name | upper) }} Frame Construction
-/////////////////////////////////////////////////////////////////////////////////
-_nonnull_
-KSRP_Status KSRP_Init_{{ frame_unique_id }}_Frame({{ frame_type }}* frame) {
-{#- TODO: Initialization  #}
-    return KSRP_STATUS_OK;
-}
-
-_nonnull_
-KSRP_Status KSRP_Unpack_{{ frame_unique_id }}(const KSRP_RawData_Frame* raw_data, {{ frame_type }}* frame) {
-    if (raw_data->length != sizeof({{ frame_type }}) + KSRP_ID_BYTES) {
-        return KSRP_STATUS_INVALID_DATA_SIZE;
-    }
-
-    if (!KSRP_IsRawDataInstanceof_{{ frame_unique_id }}(raw_data)) {
-        return KSRP_STATUS_INVALID_FRAME_TYPE;
-    }
-    {#- TODO: cast for 1-byte not being uint8_t  #}
-    {% for field in frame.fields %}
-        {%- if field.actual_size == 1 %}
-    frame->{{ field.name }} = raw_data->data[{{ field.offset }} + KSRP_ID_BYTES];
-        {%- elif field.is_type_cast %}
-    frame->{{ field.name }} = *(({{ field.cast_type }}*)&raw_data->data[{{ field.offset }} + KSRP_ID_BYTES]);
-        {%- else %}
-    frame->{{ field.name }} = *(({{ field.type }}*)&raw_data->data[{{ field.offset }} + KSRP_ID_BYTES]);
-        {%- endif  %}
-    {%- endfor %}
-
-    return KSRP_STATUS_OK;
-}
-
-_nonnull_
-KSRP_Status KSRP_Pack_{{ frame_unique_id }}(const {{ frame_type }}* frame, KSRP_RawData_Frame* raw_data) {
-    if (raw_data->capacity < sizeof({{ frame_type }}) + KSRP_ID_BYTES) {
-        return KSRP_STATUS_INVALID_DATA_SIZE;
-    }
-
-{#- TODO: cast for 1-byte not being uint8_t  #}
-    raw_data->data[0] = KSRP_{{ protocol.subsystem | upper }}_SUBSYSTEM_ID;
-    raw_data->data[1] = KSRP_{{ define_unique_id }}_FRAME_ID;
-    {% for field in frame.fields %}
-        {%- if field.actual_size == 1 %}
-    raw_data->data[{{ field.offset }} + KSRP_ID_BYTES] = frame->{{ field.name }};
-        {%- elif field.is_type_cast %}
-    *(({{ field.cast_type }}*)&raw_data->data[{{ field.offset }} + KSRP_ID_BYTES]) = frame->{{ field.name }};
-        {%- else %}
-    *(({{ field.type }}*)&raw_data->data[{{ field.offset }} + KSRP_ID_BYTES]) = frame->{{ field.name }};
-        {%- endif  %}
-    {%- endfor %}
-
-    raw_data->length = sizeof({{ frame_type }}) + KSRP_ID_BYTES;
-
-    return KSRP_STATUS_OK;
-}
 
 /////////////////////////////////////////////////////////////////////////////////
 /// {{ snake_to_camel(frame.name | upper) }} Health Checks
