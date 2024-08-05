@@ -19,15 +19,15 @@ typedef struct {
 } KSRP_Wheels_Instance;
 
 _nonnull_
-KSRP_Status KSRP_Wheels_Instance_Init(KSRP_Wheels_Instance* instance) {
-    if (KSRP_Wheels_WheelsStatus_Frame_Init(&instance->wheels_status_instance) != KSRP_STATUS_OK) {
+KSRP_Status KSRP_Init_Wheels_Instance(KSRP_Wheels_Instance* instance) {
+    if (KSRP_Init_Wheels_WheelsStatus_Frame(&instance->wheels_status_instance) != KSRP_STATUS_OK) {
         return KSRP_STATUS_ERROR;
     }
     return KSRP_STATUS_OK;
 }
 
 _nonnull_
-KSRP_Status KSRP_Wheels_Instance_UpdateFrame(
+KSRP_Status KSRP_UpdateFrame_Wheels_Instance(
     KSRP_Wheels_Instance* instance,
     KSRP_Wheels_FrameID frame_id,
     void* frame, size_t frame_size) {
@@ -51,7 +51,7 @@ KSRP_Status KSRP_Wheels_Instance_UpdateFrame(
 }
 
 _nonnull_
-KSRP_Status KSRP_Wheels_Instance_UpdateFrameField(
+KSRP_Status KSRP_UpdateFrameField_Wheels_Instance(
     KSRP_Wheels_Instance* instance,
     KSRP_Wheels_FrameID frame_id, uint32_t field_id,
     void* value, size_t value_size) {
@@ -123,7 +123,7 @@ KSRP_Status KSRP_Wheels_Instance_UpdateFrameField(
 }
 
 _nonnull_
-KSRP_Status KSRP_Wheels_Instance_UpdateTime(
+KSRP_Status KSRP_UpdateTime_Wheels_Instance(
     KSRP_Wheels_Instance* instance, uint32_t ms_since_last_update) {
     instance->wheels_status_ms_since_last_update += ms_since_last_update;
 

@@ -26,9 +26,9 @@ typedef struct {
 } KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance;
 
 _nonnull_
-KSRP_Status KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance_Init(KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance* instance) {
+KSRP_Status KSRP_Init_{{ snake_to_camel(protocol.subsystem) }}_Instance(KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance* instance) {
     {%- for frame in protocol.frames %}
-    if (KSRP_{{ snake_to_camel(protocol.subsystem) }}_{{ snake_to_camel(frame.name) }}_Frame_Init(&instance->{{ frame.name }}_instance) != KSRP_STATUS_OK) {
+    if (KSRP_Init_{{ snake_to_camel(protocol.subsystem) }}_{{ snake_to_camel(frame.name) }}_Frame(&instance->{{ frame.name }}_instance) != KSRP_STATUS_OK) {
         return KSRP_STATUS_ERROR;
     }
     {%- endfor  %}
@@ -36,7 +36,7 @@ KSRP_Status KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance_Init(KSRP_{{ 
 }
 
 _nonnull_
-KSRP_Status KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance_UpdateFrame(
+KSRP_Status KSRP_UpdateFrame_{{ snake_to_camel(protocol.subsystem) }}_Instance(
     KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance* instance,
     KSRP_{{ snake_to_camel(protocol.subsystem) }}_FrameID frame_id,
     void* frame, size_t frame_size) {
@@ -62,7 +62,7 @@ KSRP_Status KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance_UpdateFrame(
 }
 
 _nonnull_
-KSRP_Status KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance_UpdateFrameField(
+KSRP_Status KSRP_UpdateFrameField_{{ snake_to_camel(protocol.subsystem) }}_Instance(
     KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance* instance,
     KSRP_{{ snake_to_camel(protocol.subsystem) }}_FrameID frame_id, uint32_t field_id,
     void* value, size_t value_size) {
@@ -96,7 +96,7 @@ KSRP_Status KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance_UpdateFrameFi
 }
 
 _nonnull_
-KSRP_Status KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance_UpdateTime(
+KSRP_Status KSRP_UpdateTime_{{ snake_to_camel(protocol.subsystem) }}_Instance(
     KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance* instance, uint32_t ms_since_last_update) {
 
     {%- for frame in protocol.frames %}

@@ -21,18 +21,18 @@ typedef struct {
 } KSRP_Master_Instance;
 
 _nonnull_
-KSRP_Status KSRP_Master_Instance_Init(KSRP_Master_Instance* instance) {
-    if (KSRP_Master_MasterStatus_Frame_Init(&instance->master_status_instance) != KSRP_STATUS_OK) {
+KSRP_Status KSRP_Init_Master_Instance(KSRP_Master_Instance* instance) {
+    if (KSRP_Init_Master_MasterStatus_Frame(&instance->master_status_instance) != KSRP_STATUS_OK) {
         return KSRP_STATUS_ERROR;
     }
-    if (KSRP_Master_DevicesAlive_Frame_Init(&instance->devices_alive_instance) != KSRP_STATUS_OK) {
+    if (KSRP_Init_Master_DevicesAlive_Frame(&instance->devices_alive_instance) != KSRP_STATUS_OK) {
         return KSRP_STATUS_ERROR;
     }
     return KSRP_STATUS_OK;
 }
 
 _nonnull_
-KSRP_Status KSRP_Master_Instance_UpdateFrame(
+KSRP_Status KSRP_UpdateFrame_Master_Instance(
     KSRP_Master_Instance* instance,
     KSRP_Master_FrameID frame_id,
     void* frame, size_t frame_size) {
@@ -66,7 +66,7 @@ KSRP_Status KSRP_Master_Instance_UpdateFrame(
 }
 
 _nonnull_
-KSRP_Status KSRP_Master_Instance_UpdateFrameField(
+KSRP_Status KSRP_UpdateFrameField_Master_Instance(
     KSRP_Master_Instance* instance,
     KSRP_Master_FrameID frame_id, uint32_t field_id,
     void* value, size_t value_size) {
@@ -107,7 +107,7 @@ KSRP_Status KSRP_Master_Instance_UpdateFrameField(
 }
 
 _nonnull_
-KSRP_Status KSRP_Master_Instance_UpdateTime(
+KSRP_Status KSRP_UpdateTime_Master_Instance(
     KSRP_Master_Instance* instance, uint32_t ms_since_last_update) {
     instance->master_status_ms_since_last_update += ms_since_last_update;
     instance->devices_alive_ms_since_last_update += ms_since_last_update;
