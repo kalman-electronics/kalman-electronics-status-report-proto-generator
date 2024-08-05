@@ -46,5 +46,5 @@ jobs:
       id: create_release
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: "Release ${{ github.ref }}"
+        tag_name: ksrp
         files: protocol.zip
