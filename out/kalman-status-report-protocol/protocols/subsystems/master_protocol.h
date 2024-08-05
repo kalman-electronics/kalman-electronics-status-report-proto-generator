@@ -79,7 +79,7 @@ uint8_t KSRP_Get_Master_MasterStatus_CanStatus(const KSRP_Master_MasterStatus_Fr
 /// MasterStatus Frame Construction
 /////////////////////////////////////////////////////////////////////////////////
 _nonnull_
-KSRP_Status KSRP_Init_Master_MasterStatus(KSRP_Master_MasterStatus_Frame* frame) {
+KSRP_Status KSRP_Init_Master_MasterStatus_Frame(KSRP_Master_MasterStatus_Frame* frame) {
     return KSRP_STATUS_OK;
 }
 
@@ -215,7 +215,7 @@ uint8_t KSRP_Get_Master_DevicesAlive_Wheels(const KSRP_Master_DevicesAlive_Frame
 /// DevicesAlive Frame Construction
 /////////////////////////////////////////////////////////////////////////////////
 _nonnull_
-KSRP_Status KSRP_Init_Master_DevicesAlive(KSRP_Master_DevicesAlive_Frame* frame) {
+KSRP_Status KSRP_Init_Master_DevicesAlive_Frame(KSRP_Master_DevicesAlive_Frame* frame) {
     return KSRP_STATUS_OK;
 }
 

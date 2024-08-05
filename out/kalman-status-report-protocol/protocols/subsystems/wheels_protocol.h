@@ -158,7 +158,7 @@ bool KSRP_Get_Wheels_WheelsStatus_Testbool(const KSRP_Wheels_WheelsStatus_Frame*
 /// WheelsStatus Frame Construction
 /////////////////////////////////////////////////////////////////////////////////
 _nonnull_
-KSRP_Status KSRP_Init_Wheels_WheelsStatus(KSRP_Wheels_WheelsStatus_Frame* frame) {
+KSRP_Status KSRP_Init_Wheels_WheelsStatus_Frame(KSRP_Wheels_WheelsStatus_Frame* frame) {
     return KSRP_STATUS_OK;
 }
 
