@@ -10,6 +10,8 @@
 #include "kalman-status-report-protocol/common.h"
 #include "kalman-status-report-protocol/protocols/subsystems/wheels_protocol.h"
 
+//TODO: Subscription to frame updates (callbacks)
+
 typedef struct {
     KSRP_Wheels_WheelsStatus_Frame wheels_status_instance;
     
@@ -18,7 +20,9 @@ typedef struct {
 
 _nonnull_
 KSRP_Status KSRP_Wheels_Instance_Init(KSRP_Wheels_Instance* instance) {
-    // TODO: Initialize all the instances
+    if (KSRP_Wheels_WHEELS_STATUS_Frame_Init(&instance->wheels_status_instance) != KSRP_STATUS_OK) {
+        return KSRP_STATUS_ERROR;
+    }
     return KSRP_STATUS_OK;
 }
 
@@ -116,6 +120,26 @@ KSRP_Status KSRP_Wheels_Instance_UpdateFrameField(
             return KSRP_STATUS_INVALID_FRAME_TYPE;
     }
     return KSRP_STATUS_OK;
+}
+
+_nonnull_
+KSRP_Status KSRP_Wheels_Instance_UpdateTime(
+    KSRP_Wheels_Instance* instance, uint32_t ms_since_last_update) {
+    instance->wheels_status_ms_since_last_update += ms_since_last_update;
+
+    return KSRP_STATUS_OK;
+}
+
+_nonnull_
+uint32_t KSRP_Wheels_Instance_GetTimeSinceLastUpdate(
+    KSRP_Wheels_Instance* instance, KSRP_Wheels_FrameID frame_id) {
+
+    switch(frame_id) {
+        case KSRP_WHEELS_WHEELS_STATUS_FRAME_ID:
+            return instance->wheels_status_ms_since_last_update;
+        default:
+            return 0;
+    }
 }
 
 #endif // KALMAN_STATUS_REPORT_WHEELS_INSTANCE_H_

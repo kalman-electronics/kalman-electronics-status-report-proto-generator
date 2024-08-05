@@ -14,6 +14,8 @@
 #include "{{ lib }}"
 {%- endfor %}
 
+//TODO: Subscription to frame updates (callbacks)
+
 typedef struct {
     {%- for frame in protocol.frames %}
     KSRP_{{ snake_to_camel(protocol.subsystem) }}_{{ snake_to_camel (frame.name | upper) }}_Frame {{ frame.name }}_instance;
@@ -25,7 +27,11 @@ typedef struct {
 
 _nonnull_
 KSRP_Status KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance_Init(KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance* instance) {
-    // TODO: Initialize all the instances
+    {%- for frame in protocol.frames %}
+    if (KSRP_{{ snake_to_camel(protocol.subsystem) }}_{{ frame.name | upper }}_Frame_Init(&instance->{{ frame.name }}_instance) != KSRP_STATUS_OK) {
+        return KSRP_STATUS_ERROR;
+    }
+    {%- endfor  %}
     return KSRP_STATUS_OK;
 }
 
@@ -87,6 +93,31 @@ KSRP_Status KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance_UpdateFrameFi
             return KSRP_STATUS_INVALID_FRAME_TYPE;
     }
     return KSRP_STATUS_OK;
+}
+
+_nonnull_
+KSRP_Status KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance_UpdateTime(
+    KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance* instance, uint32_t ms_since_last_update) {
+
+    {%- for frame in protocol.frames %}
+    instance->{{ frame.name }}_ms_since_last_update += ms_since_last_update;
+    {%- endfor %}
+
+    return KSRP_STATUS_OK;
+}
+
+_nonnull_
+uint32_t KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance_GetTimeSinceLastUpdate(
+    KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance* instance, KSRP_{{ snake_to_camel(protocol.subsystem) }}_FrameID frame_id) {
+
+    switch(frame_id) {
+        {%- for frame in protocol.frames %}
+        case KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_FRAME_ID:
+            return instance->{{ frame.name }}_ms_since_last_update;
+        {%- endfor %}
+        default:
+            return 0;
+    }
 }
 
 #endif // KALMAN_STATUS_REPORT_{{ protocol.subsystem | upper }}_INSTANCE_H_

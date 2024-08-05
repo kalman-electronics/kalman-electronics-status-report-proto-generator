@@ -10,6 +10,8 @@
 #include "kalman-status-report-protocol/common.h"
 #include "kalman-status-report-protocol/protocols/subsystems/master_protocol.h"
 
+//TODO: Subscription to frame updates (callbacks)
+
 typedef struct {
     KSRP_Master_MasterStatus_Frame master_status_instance;
     KSRP_Master_DevicesAlive_Frame devices_alive_instance;
@@ -20,7 +22,12 @@ typedef struct {
 
 _nonnull_
 KSRP_Status KSRP_Master_Instance_Init(KSRP_Master_Instance* instance) {
-    // TODO: Initialize all the instances
+    if (KSRP_Master_MASTER_STATUS_Frame_Init(&instance->master_status_instance) != KSRP_STATUS_OK) {
+        return KSRP_STATUS_ERROR;
+    }
+    if (KSRP_Master_DEVICES_ALIVE_Frame_Init(&instance->devices_alive_instance) != KSRP_STATUS_OK) {
+        return KSRP_STATUS_ERROR;
+    }
     return KSRP_STATUS_OK;
 }
 
@@ -97,6 +104,29 @@ KSRP_Status KSRP_Master_Instance_UpdateFrameField(
             return KSRP_STATUS_INVALID_FRAME_TYPE;
     }
     return KSRP_STATUS_OK;
+}
+
+_nonnull_
+KSRP_Status KSRP_Master_Instance_UpdateTime(
+    KSRP_Master_Instance* instance, uint32_t ms_since_last_update) {
+    instance->master_status_ms_since_last_update += ms_since_last_update;
+    instance->devices_alive_ms_since_last_update += ms_since_last_update;
+
+    return KSRP_STATUS_OK;
+}
+
+_nonnull_
+uint32_t KSRP_Master_Instance_GetTimeSinceLastUpdate(
+    KSRP_Master_Instance* instance, KSRP_Master_FrameID frame_id) {
+
+    switch(frame_id) {
+        case KSRP_MASTER_MASTER_STATUS_FRAME_ID:
+            return instance->master_status_ms_since_last_update;
+        case KSRP_MASTER_DEVICES_ALIVE_FRAME_ID:
+            return instance->devices_alive_ms_since_last_update;
+        default:
+            return 0;
+    }
 }
 
 #endif // KALMAN_STATUS_REPORT_MASTER_INSTANCE_H_
