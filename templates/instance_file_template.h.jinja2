@@ -28,7 +28,7 @@ typedef struct {
 _nonnull_
 KSRP_Status KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance_Init(KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance* instance) {
     {%- for frame in protocol.frames %}
-    if (KSRP_{{ snake_to_camel(protocol.subsystem) }}_{{ frame.name | upper }}_Frame_Init(&instance->{{ frame.name }}_instance) != KSRP_STATUS_OK) {
+    if (KSRP_{{ snake_to_camel(protocol.subsystem) }}_{{ snake_to_camel(frame.name) }}_Frame_Init(&instance->{{ frame.name }}_instance) != KSRP_STATUS_OK) {
         return KSRP_STATUS_ERROR;
     }
     {%- endfor  %}
