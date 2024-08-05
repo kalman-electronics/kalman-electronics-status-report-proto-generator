@@ -11,7 +11,7 @@
 #include "kalman-status-report-protocol/protocols/subsystems/master_protocol.h"
 
 //TODO: Subscription to frame updates (callbacks)
-
+//TODO: Docs
 typedef struct {
     KSRP_Master_MasterStatus_Frame master_status_instance;
     KSRP_Master_DevicesAlive_Frame devices_alive_instance;
@@ -22,10 +22,10 @@ typedef struct {
 
 _nonnull_
 KSRP_Status KSRP_Master_Instance_Init(KSRP_Master_Instance* instance) {
-    if (KSRP_Master_MASTER_STATUS_Frame_Init(&instance->master_status_instance) != KSRP_STATUS_OK) {
+    if (KSRP_Master_MasterStatus_Frame_Init(&instance->master_status_instance) != KSRP_STATUS_OK) {
         return KSRP_STATUS_ERROR;
     }
-    if (KSRP_Master_DEVICES_ALIVE_Frame_Init(&instance->devices_alive_instance) != KSRP_STATUS_OK) {
+    if (KSRP_Master_DevicesAlive_Frame_Init(&instance->devices_alive_instance) != KSRP_STATUS_OK) {
         return KSRP_STATUS_ERROR;
     }
     return KSRP_STATUS_OK;
