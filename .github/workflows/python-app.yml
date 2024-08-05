@@ -47,5 +47,5 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         name: Release
-        tag_name: ksrp_release
+        tag_name: latest, ${{ tag }}
         files: protocol.zip
