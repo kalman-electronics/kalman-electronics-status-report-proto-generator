@@ -9,7 +9,6 @@ from distutils.dir_util import copy_tree
 
 def generate_devices_protocols(protocols):
     devices_protocols_c_codes = {}
-
     jinja_env = Environment(loader=FileSystemLoader(args.templates))
 
     for protocol_name, protocol in protocols.items():
