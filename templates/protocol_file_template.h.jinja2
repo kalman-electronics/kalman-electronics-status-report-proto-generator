@@ -10,7 +10,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif //__cplusplus
 
 // Include standard libraries
 {%- for clib in clibraries %}
@@ -372,6 +372,6 @@ const char* KSRP_HealthCheckDescription_{{ frame_unique_id }}_{{ snake_to_camel(
 
 #ifdef __cplusplus
 }
-#endif
+#endif //__cplusplus
 
 #endif // KALMAN_STATUS_REPORT_{{ protocol.subsytem | upper }}_H_

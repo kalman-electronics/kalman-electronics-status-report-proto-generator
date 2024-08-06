@@ -1,19 +1,14 @@
 #ifndef KALMAN_PROTOCOL_STATUS_REPORT_FRAMES_H_
 #define KALMAN_PROTOCOL_STATUS_REPORT_FRAMES_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 #include <stdint.h>
 #include <string.h>
 
 #include "common.h"
-
-typedef enum {
-    KSRP_STATUS_OK,
-    KSRP_STATUS_INVALID_DATA_SIZE,
-    KSRP_STATUS_INVALID_FRAME_TYPE,
-    KSRP_STATUS_INVALID_FIELD_TYPE,
-
-    KSRP_STATUS_ERROR
-} KSRP_Status;
 
 typedef struct {
     uint8_t* data;
@@ -55,5 +50,9 @@ KSRP_TypeID KSRP_RawData_Frame_GetTypeID(const KSRP_RawData_Frame* raw_data) {
 void KSRP_RawDataFrame_Clear(KSRP_RawData_Frame* raw_data) {
     raw_data->length = 0;
 }
+
+#ifdef __cplusplus
+}
+#endif // __cplusplus
 
 #endif // KALMAN_PROTOCOL_STATUS_REPORT_FRAMES_H_

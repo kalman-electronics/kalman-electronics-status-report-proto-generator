@@ -8,6 +8,10 @@
 #ifndef KALMAN_STATUS_REPORT_{{ protocol.subsystem | upper }}_INSTANCE_H_
 #define KALMAN_STATUS_REPORT_{{ protocol.subsystem | upper }}_INSTANCE_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 // Include standard libraries
 {%- for clib in clibraries %}
 #include <{{ clib }}>
@@ -18,7 +22,7 @@
 #include "{{ lib }}"
 {%- endfor %}
 
-//TODO: Subscription to frame updates (callbacks), and automatic frame sending
+//TODO: Automatic frame sending
 /**
  * @brief Instance structure for the {{ protocol.subsystem }} subsystem
  */
@@ -29,6 +33,9 @@ typedef struct {
     {% for frame in protocol.frames %}
     uint32_t {{ frame.name }}_ms_since_last_update;
     {%- endfor  %}
+    {% for frame in protocol.frames %}
+    KSRP_FrameUpdateCallback {{ frame.name }}_callback;
+    {%- endfor  %}
 } KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance;
 
 /**
@@ -36,7 +43,6 @@ typedef struct {
  *
  * @param instance The instance to initialize
  * @return KSRP_Status The status of the initialization, KSRP_STATUS_OK if successful
-
  */
 _nonnull_
 KSRP_Status KSRP_Init_{{ snake_to_camel(protocol.subsystem) }}_Instance(KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance* instance) {
@@ -72,6 +78,11 @@ KSRP_Status KSRP_UpdateFrame_{{ snake_to_camel(protocol.subsystem) }}_Instance(
 
             memcpy(&instance->{{ frame.name }}_instance, frame, frame_size);
             instance->{{ frame.name }}_ms_since_last_update = 0;
+            instance->{{ frame.name }}_callback(
+                KSRP_{{ protocol.subsystem | upper }}_SUBSYSTEM_ID,
+                &instance->{{ frame.name }}_instance,
+                KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_FRAME_ID,
+                KSRP_ILLEGAL_FIELD_ID);
 
             break;
         }
@@ -117,6 +128,12 @@ KSRP_Status KSRP_UpdateFrameField_{{ snake_to_camel(protocol.subsystem) }}_Insta
                 default:
                     return KSRP_STATUS_INVALID_FIELD_TYPE;
             }
+            instance->{{ frame.name }}_callback(
+                KSRP_{{ protocol.subsystem | upper }}_SUBSYSTEM_ID,
+                &instance->{{ frame.name }}_instance,
+                KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_FRAME_ID,
+                field_id);
+            break;
             {%- for field in frame.fields %}
 
             {%- endfor %}
@@ -162,8 +179,31 @@ uint32_t KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance_GetTimeSinceLast
             return instance->{{ frame.name }}_ms_since_last_update;
         {%- endfor %}
         default:
-            return 0;
+            return 0xFFFFFFFF;
     }
 }
+
+_nonnull_
+KSRP_Status KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance_SetCallback(
+    KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance* instance,
+    KSRP_{{ snake_to_camel(protocol.subsystem) }}_FrameID frame_id,
+    KSRP_FrameUpdateCallback callback) {
+
+    switch(frame_id) {
+        {%- for frame in protocol.frames %}
+        case KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_FRAME_ID:
+            instance->{{ frame.name }}_callback = callback;
+            break;
+        {%- endfor %}
+        default:
+            return KSRP_STATUS_INVALID_FRAME_TYPE;
+    }
+
+    return KSRP_STATUS_OK;
+}
+
+#ifdef __cplusplus
+}
+#endif // __cplusplus
 
 #endif // KALMAN_STATUS_REPORT_{{ protocol.subsystem | upper }}_INSTANCE_H_

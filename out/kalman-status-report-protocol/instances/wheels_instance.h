@@ -4,6 +4,10 @@
  */#ifndef KALMAN_STATUS_REPORT_WHEELS_INSTANCE_H_
 #define KALMAN_STATUS_REPORT_WHEELS_INSTANCE_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 // Include standard libraries
 #include <stdint.h>
 #include <stdbool.h>
@@ -21,6 +25,8 @@ typedef struct {
     KSRP_Wheels_WheelsStatus_Frame wheels_status_instance;
     
     uint32_t wheels_status_ms_since_last_update;
+    
+    KSRP_FrameUpdateCallback wheels_status_callback;
 } KSRP_Wheels_Instance;
 
 /**
@@ -28,7 +34,6 @@ typedef struct {
  *
  * @param instance The instance to initialize
  * @return KSRP_Status The status of the initialization, KSRP_STATUS_OK if successful
-
  */
 _nonnull_
 KSRP_Status KSRP_Init_Wheels_Instance(KSRP_Wheels_Instance* instance) {
@@ -61,6 +66,11 @@ KSRP_Status KSRP_UpdateFrame_Wheels_Instance(
 
             memcpy(&instance->wheels_status_instance, frame, frame_size);
             instance->wheels_status_ms_since_last_update = 0;
+            instance->wheels_status_callback(
+                KSRP_WHEELS_SUBSYSTEM_ID,
+                &instance->wheels_status_instance,
+                KSRP_WHEELS_WHEELS_STATUS_FRAME_ID,
+                KSRP_ILLEGAL_FIELD_ID);
 
             break;
         }
@@ -147,6 +157,12 @@ KSRP_Status KSRP_UpdateFrameField_Wheels_Instance(
                 default:
                     return KSRP_STATUS_INVALID_FIELD_TYPE;
             }
+            instance->wheels_status_callback(
+                KSRP_WHEELS_SUBSYSTEM_ID,
+                &instance->wheels_status_instance,
+                KSRP_WHEELS_WHEELS_STATUS_FRAME_ID,
+                field_id);
+            break;
         default:
             return KSRP_STATUS_INVALID_FRAME_TYPE;
     }
@@ -183,8 +199,29 @@ uint32_t KSRP_Wheels_Instance_GetTimeSinceLastUpdate(
         case KSRP_WHEELS_WHEELS_STATUS_FRAME_ID:
             return instance->wheels_status_ms_since_last_update;
         default:
-            return 0;
+            return 0xFFFFFFFF;
     }
 }
+
+_nonnull_
+KSRP_Status KSRP_Wheels_Instance_SetCallback(
+    KSRP_Wheels_Instance* instance,
+    KSRP_Wheels_FrameID frame_id,
+    KSRP_FrameUpdateCallback callback) {
+
+    switch(frame_id) {
+        case KSRP_WHEELS_WHEELS_STATUS_FRAME_ID:
+            instance->wheels_status_callback = callback;
+            break;
+        default:
+            return KSRP_STATUS_INVALID_FRAME_TYPE;
+    }
+
+    return KSRP_STATUS_OK;
+}
+
+#ifdef __cplusplus
+}
+#endif // __cplusplus
 
 #endif // KALMAN_STATUS_REPORT_WHEELS_INSTANCE_H_

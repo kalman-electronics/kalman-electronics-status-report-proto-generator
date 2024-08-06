@@ -5,6 +5,10 @@
 #ifndef KALMAN_STATUS_REPORT_UTIL_H_
 #define KALMAN_STATUS_REPORT_UTIL_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 // Include standard libraries
 #include <stdint.h>
 #include <stdbool.h>
@@ -35,5 +39,9 @@ KSRP_TypeID KSRP_VerifyTypeID(const KSRP_RawData_Frame* frame) {
 
     return KSRP_ILLEGAL_TYPE_ID;
 }
+
+#ifdef __cplusplus
+}
+#endif // __cplusplus
 
 #endif // KALMAN_STATUS_REPORT_UTIL_H_

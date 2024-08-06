@@ -4,6 +4,10 @@
  */#ifndef KALMAN_STATUS_REPORT_MASTER_INSTANCE_H_
 #define KALMAN_STATUS_REPORT_MASTER_INSTANCE_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 // Include standard libraries
 #include <stdint.h>
 #include <stdbool.h>
@@ -23,6 +27,9 @@ typedef struct {
     
     uint32_t master_status_ms_since_last_update;
     uint32_t devices_alive_ms_since_last_update;
+    
+    KSRP_FrameUpdateCallback master_status_callback;
+    KSRP_FrameUpdateCallback devices_alive_callback;
 } KSRP_Master_Instance;
 
 /**
@@ -30,7 +37,6 @@ typedef struct {
  *
  * @param instance The instance to initialize
  * @return KSRP_Status The status of the initialization, KSRP_STATUS_OK if successful
-
  */
 _nonnull_
 KSRP_Status KSRP_Init_Master_Instance(KSRP_Master_Instance* instance) {
@@ -66,6 +72,11 @@ KSRP_Status KSRP_UpdateFrame_Master_Instance(
 
             memcpy(&instance->master_status_instance, frame, frame_size);
             instance->master_status_ms_since_last_update = 0;
+            instance->master_status_callback(
+                KSRP_MASTER_SUBSYSTEM_ID,
+                &instance->master_status_instance,
+                KSRP_MASTER_MASTER_STATUS_FRAME_ID,
+                KSRP_ILLEGAL_FIELD_ID);
 
             break;
         }
@@ -76,6 +87,11 @@ KSRP_Status KSRP_UpdateFrame_Master_Instance(
 
             memcpy(&instance->devices_alive_instance, frame, frame_size);
             instance->devices_alive_ms_since_last_update = 0;
+            instance->devices_alive_callback(
+                KSRP_MASTER_SUBSYSTEM_ID,
+                &instance->devices_alive_instance,
+                KSRP_MASTER_DEVICES_ALIVE_FRAME_ID,
+                KSRP_ILLEGAL_FIELD_ID);
 
             break;
         }
@@ -117,6 +133,12 @@ KSRP_Status KSRP_UpdateFrameField_Master_Instance(
                 default:
                     return KSRP_STATUS_INVALID_FIELD_TYPE;
             }
+            instance->master_status_callback(
+                KSRP_MASTER_SUBSYSTEM_ID,
+                &instance->master_status_instance,
+                KSRP_MASTER_MASTER_STATUS_FRAME_ID,
+                field_id);
+            break;
         case KSRP_MASTER_DEVICES_ALIVE_FRAME_ID:
             switch(field_id) {
                 case KSRP_MASTER_DEVICES_ALIVE_WHEELS_FIELD_ID:
@@ -131,6 +153,12 @@ KSRP_Status KSRP_UpdateFrameField_Master_Instance(
                 default:
                     return KSRP_STATUS_INVALID_FIELD_TYPE;
             }
+            instance->devices_alive_callback(
+                KSRP_MASTER_SUBSYSTEM_ID,
+                &instance->devices_alive_instance,
+                KSRP_MASTER_DEVICES_ALIVE_FRAME_ID,
+                field_id);
+            break;
         default:
             return KSRP_STATUS_INVALID_FRAME_TYPE;
     }
@@ -170,8 +198,32 @@ uint32_t KSRP_Master_Instance_GetTimeSinceLastUpdate(
         case KSRP_MASTER_DEVICES_ALIVE_FRAME_ID:
             return instance->devices_alive_ms_since_last_update;
         default:
-            return 0;
+            return 0xFFFFFFFF;
     }
 }
+
+_nonnull_
+KSRP_Status KSRP_Master_Instance_SetCallback(
+    KSRP_Master_Instance* instance,
+    KSRP_Master_FrameID frame_id,
+    KSRP_FrameUpdateCallback callback) {
+
+    switch(frame_id) {
+        case KSRP_MASTER_MASTER_STATUS_FRAME_ID:
+            instance->master_status_callback = callback;
+            break;
+        case KSRP_MASTER_DEVICES_ALIVE_FRAME_ID:
+            instance->devices_alive_callback = callback;
+            break;
+        default:
+            return KSRP_STATUS_INVALID_FRAME_TYPE;
+    }
+
+    return KSRP_STATUS_OK;
+}
+
+#ifdef __cplusplus
+}
+#endif // __cplusplus
 
 #endif // KALMAN_STATUS_REPORT_MASTER_INSTANCE_H_

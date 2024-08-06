@@ -6,7 +6,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif //__cplusplus
 
 // Include standard libraries
 #include <stdint.h>
@@ -481,6 +481,6 @@ const char* KSRP_HealthCheckDescription_Master_DevicesAlive_Wheels(const KSRP_Ma
 
 #ifdef __cplusplus
 }
-#endif
+#endif //__cplusplus
 
 #endif // KALMAN_STATUS_REPORT__H_

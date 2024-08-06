@@ -1,6 +1,10 @@
 #ifndef KALMAN_PROTOCOL_STATUS_REPORT_COMMON_H_
 #define KALMAN_PROTOCOL_STATUS_REPORT_COMMON_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 #include <stdint.h>
 
 #define KSRP_ID_BYTES 2
@@ -15,5 +19,22 @@ typedef enum {
 
     KSRP_RESULT_UNKNOWN
 } KSRP_HealthCheckResult;
+
+typedef enum {
+    KSRP_STATUS_OK,
+    KSRP_STATUS_INVALID_DATA_SIZE,
+    KSRP_STATUS_INVALID_FRAME_TYPE,
+    KSRP_STATUS_INVALID_FIELD_TYPE,
+
+    KSRP_STATUS_ERROR
+} KSRP_Status;
+
+#define KSRP_ILLEGAL_FRAME_ID 0xFFFFFFFF
+#define KSRP_ILLEGAL_FIELD_ID 0xFFFFFFFF
+typedef KSRP_Status (*KSRP_FrameUpdateCallback)(KSRP_SubsystemID subsystem_id, void* frame_instance, uint32_t frame_id, uint32_t field_id);
+
+#ifdef __cplusplus
+}
+#endif // __cplusplus
 
 #endif // KALMAN_PROTOCOL_STATUS_REPORT_COMMON_H_
