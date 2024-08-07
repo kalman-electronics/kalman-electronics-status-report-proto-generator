@@ -76,13 +76,19 @@ KSRP_Status KSRP_UpdateFrame_{{ snake_to_camel(protocol.subsystem) }}_Instance(
                 return KSRP_STATUS_INVALID_DATA_SIZE;
             }
 
+            bool change = memcmp(&instance->{{ frame.name }}_instance, frame, frame_size) != 0;
+
             memcpy(&instance->{{ frame.name }}_instance, frame, frame_size);
             instance->{{ frame.name }}_ms_since_last_update = 0;
-            instance->{{ frame.name }}_callback(
-                KSRP_{{ protocol.subsystem | upper }}_SUBSYSTEM_ID,
-                &instance->{{ frame.name }}_instance,
-                KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_FRAME_ID,
-                KSRP_ILLEGAL_FIELD_ID);
+
+            if (instance->{{ frame.name }}_callback != NULL)
+                if (change)
+                    if (instance->{{ frame.name }}_callback(
+                                KSRP_{{ protocol.subsystem | upper }}_SUBSYSTEM_ID,
+                                &instance->{{ frame.name }}_instance,
+                                KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_FRAME_ID,
+                                KSRP_ILLEGAL_FIELD_ID) != KSRP_STATUS_OK)
+                        return KSRP_STATUS_ERROR;
 
             break;
         }
@@ -120,19 +126,26 @@ KSRP_Status KSRP_UpdateFrameField_{{ snake_to_camel(protocol.subsystem) }}_Insta
                         return KSRP_STATUS_INVALID_DATA_SIZE;
                     }
 
+                    bool change = memcmp(&instance->{{ frame.name }}_instance.{{ field.name }}, value, value_size) != 0;
+
                     memcpy(&instance->{{ frame.name }}_instance.{{ field.name }}, value, value_size);
                     instance->{{ frame.name }}_ms_since_last_update = 0;
+
+                    if (instance->{{ frame.name }}_callback != NULL)
+                        if (change)
+                            if (instance->{{ frame.name }}_callback(
+                                        KSRP_{{ protocol.subsystem | upper }}_SUBSYSTEM_ID,
+                                        &instance->{{ frame.name }}_instance,
+                                        KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_FRAME_ID,
+                                        KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_{{ field.name | upper }}_FIELD_ID) != KSRP_STATUS_OK)
+                                return KSRP_STATUS_ERROR;
 
                     break;
                 {%- endfor %}
                 default:
                     return KSRP_STATUS_INVALID_FIELD_TYPE;
             }
-            instance->{{ frame.name }}_callback(
-                KSRP_{{ protocol.subsystem | upper }}_SUBSYSTEM_ID,
-                &instance->{{ frame.name }}_instance,
-                KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_FRAME_ID,
-                field_id);
+
             break;
             {%- for field in frame.fields %}
 

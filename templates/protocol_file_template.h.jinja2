@@ -241,6 +241,29 @@ KSRP_Status KSRP_Pack_{{ frame_unique_id }}(const {{ frame_type }}* frame, KSRP_
     return KSRP_STATUS_OK;
 }
 
+int KSRP_{{ frame_unique_id }}_Frame_Compare(const {{ frame_type }}* frame1, const {{ frame_type }}* frame2) {
+    if (frame1 == frame2) return 0;
+    if (frame1 == NULL) return -1;
+    if (frame2 == NULL) return 1;
+
+    {%- for field in frame.fields %}
+        {%- if field.is_type_cast %}
+    if (frame1->{{ field.name }} < frame2->{{ field.name }}) {
+        return -1;
+    } else if (frame1->{{ field.name }} > frame2->{{ field.name }}) {
+        return 1;
+    }
+        {%- else %}
+    if (frame1->{{ field.name }} < frame2->{{ field.name }}) {
+        return -1;
+    } else if (frame1->{{ field.name }} > frame2->{{ field.name }}) {
+        return 1;
+    }
+        {%- endif %}
+    {%- endfor %}
+
+    return 0;
+}
 
 /////////////////////////////////////////////////////////////////////////////////
 /// {{ snake_to_camel(frame.name | upper) }} Setters
