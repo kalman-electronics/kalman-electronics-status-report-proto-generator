@@ -241,6 +241,13 @@ KSRP_Status KSRP_Pack_{{ frame_unique_id }}(const {{ frame_type }}* frame, KSRP_
     return KSRP_STATUS_OK;
 }
 
+/**
+ * @brief Compare two {{ frame.name | upper }} frames
+ *
+ * @param frame1 The first frame to compare
+ * @param frame2 The second frame to compare
+ * @return int 0 if the frames are equal, -1 if frame1 is less than frame2, 1 if frame1 is greater than frame2
+ */
 int KSRP_{{ frame_unique_id }}_Frame_Compare(const {{ frame_type }}* frame1, const {{ frame_type }}* frame2) {
     if (frame1 == frame2) return 0;
     if (frame1 == NULL) return -1;

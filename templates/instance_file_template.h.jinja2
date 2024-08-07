@@ -196,6 +196,14 @@ uint32_t KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance_GetTimeSinceLast
     }
 }
 
+/**
+ * @brief Set the callback for a frame in the instance, callback is called when frame value is changed
+ *
+ * @param instance The instance to set the callback for
+ * @param frame_id The ID of the frame to set the callback for
+ * @param callback The callback function to set
+ * @return KSRP_Status The status of the operation, KSRP_STATUS_OK if successful
+ */
 _nonnull_
 KSRP_Status KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance_SetCallback(
     KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance* instance,
