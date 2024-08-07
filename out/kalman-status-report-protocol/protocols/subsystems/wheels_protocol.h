@@ -210,6 +210,43 @@ KSRP_Status KSRP_Pack_Wheels_WheelsStatus(const KSRP_Wheels_WheelsStatus_Frame* 
     return KSRP_STATUS_OK;
 }
 
+int KSRP_Wheels_WheelsStatus_Frame_Compare(const KSRP_Wheels_WheelsStatus_Frame* frame1, const KSRP_Wheels_WheelsStatus_Frame* frame2) {
+    if (frame1 == frame2) return 0;
+    if (frame1 == NULL) return -1;
+    if (frame2 == NULL) return 1;
+    if (frame1->device_id < frame2->device_id) {
+        return -1;
+    } else if (frame1->device_id > frame2->device_id) {
+        return 1;
+    }
+    if (frame1->driver_status < frame2->driver_status) {
+        return -1;
+    } else if (frame1->driver_status > frame2->driver_status) {
+        return 1;
+    }
+    if (frame1->temperature < frame2->temperature) {
+        return -1;
+    } else if (frame1->temperature > frame2->temperature) {
+        return 1;
+    }
+    if (frame1->algorithm_type < frame2->algorithm_type) {
+        return -1;
+    } else if (frame1->algorithm_type > frame2->algorithm_type) {
+        return 1;
+    }
+    if (frame1->algorithm_type2 < frame2->algorithm_type2) {
+        return -1;
+    } else if (frame1->algorithm_type2 > frame2->algorithm_type2) {
+        return 1;
+    }
+    if (frame1->testbool < frame2->testbool) {
+        return -1;
+    } else if (frame1->testbool > frame2->testbool) {
+        return 1;
+    }
+
+    return 0;
+}
 
 /////////////////////////////////////////////////////////////////////////////////
 /// WheelsStatus Setters

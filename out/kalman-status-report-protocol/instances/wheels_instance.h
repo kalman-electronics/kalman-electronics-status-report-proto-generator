@@ -17,7 +17,7 @@ extern "C" {
 #include "kalman-status-report-protocol/common.h"
 #include "kalman-status-report-protocol/protocols/subsystems/wheels_protocol.h"
 
-//TODO: Subscription to frame updates (callbacks), and automatic frame sending
+//TODO: Automatic frame sending
 /**
  * @brief Instance structure for the wheels subsystem
  */
@@ -64,13 +64,19 @@ KSRP_Status KSRP_UpdateFrame_Wheels_Instance(
                 return KSRP_STATUS_INVALID_DATA_SIZE;
             }
 
+            bool change = memcmp(&instance->wheels_status_instance, frame, frame_size) != 0;
+
             memcpy(&instance->wheels_status_instance, frame, frame_size);
             instance->wheels_status_ms_since_last_update = 0;
-            instance->wheels_status_callback(
-                KSRP_WHEELS_SUBSYSTEM_ID,
-                &instance->wheels_status_instance,
-                KSRP_WHEELS_WHEELS_STATUS_FRAME_ID,
-                KSRP_ILLEGAL_FIELD_ID);
+
+            if (instance->wheels_status_callback != NULL)
+                if (change)
+                    if (instance->wheels_status_callback(
+                                KSRP_WHEELS_SUBSYSTEM_ID,
+                                &instance->wheels_status_instance,
+                                KSRP_WHEELS_WHEELS_STATUS_FRAME_ID,
+                                KSRP_ILLEGAL_FIELD_ID) != KSRP_STATUS_OK)
+                        return KSRP_STATUS_ERROR;
 
             break;
         }
@@ -105,8 +111,19 @@ KSRP_Status KSRP_UpdateFrameField_Wheels_Instance(
                         return KSRP_STATUS_INVALID_DATA_SIZE;
                     }
 
+                    bool change = memcmp(&instance->wheels_status_instance.device_id, value, value_size) != 0;
+
                     memcpy(&instance->wheels_status_instance.device_id, value, value_size);
                     instance->wheels_status_ms_since_last_update = 0;
+
+                    if (instance->wheels_status_callback != NULL)
+                        if (change)
+                            if (instance->wheels_status_callback(
+                                        KSRP_WHEELS_SUBSYSTEM_ID,
+                                        &instance->wheels_status_instance,
+                                        KSRP_WHEELS_WHEELS_STATUS_FRAME_ID,
+                                        KSRP_WHEELS_WHEELS_STATUS_DEVICE_ID_FIELD_ID) != KSRP_STATUS_OK)
+                                return KSRP_STATUS_ERROR;
 
                     break;
                 case KSRP_WHEELS_WHEELS_STATUS_DRIVER_STATUS_FIELD_ID:
@@ -114,8 +131,19 @@ KSRP_Status KSRP_UpdateFrameField_Wheels_Instance(
                         return KSRP_STATUS_INVALID_DATA_SIZE;
                     }
 
+                    bool change = memcmp(&instance->wheels_status_instance.driver_status, value, value_size) != 0;
+
                     memcpy(&instance->wheels_status_instance.driver_status, value, value_size);
                     instance->wheels_status_ms_since_last_update = 0;
+
+                    if (instance->wheels_status_callback != NULL)
+                        if (change)
+                            if (instance->wheels_status_callback(
+                                        KSRP_WHEELS_SUBSYSTEM_ID,
+                                        &instance->wheels_status_instance,
+                                        KSRP_WHEELS_WHEELS_STATUS_FRAME_ID,
+                                        KSRP_WHEELS_WHEELS_STATUS_DRIVER_STATUS_FIELD_ID) != KSRP_STATUS_OK)
+                                return KSRP_STATUS_ERROR;
 
                     break;
                 case KSRP_WHEELS_WHEELS_STATUS_TEMPERATURE_FIELD_ID:
@@ -123,8 +151,19 @@ KSRP_Status KSRP_UpdateFrameField_Wheels_Instance(
                         return KSRP_STATUS_INVALID_DATA_SIZE;
                     }
 
+                    bool change = memcmp(&instance->wheels_status_instance.temperature, value, value_size) != 0;
+
                     memcpy(&instance->wheels_status_instance.temperature, value, value_size);
                     instance->wheels_status_ms_since_last_update = 0;
+
+                    if (instance->wheels_status_callback != NULL)
+                        if (change)
+                            if (instance->wheels_status_callback(
+                                        KSRP_WHEELS_SUBSYSTEM_ID,
+                                        &instance->wheels_status_instance,
+                                        KSRP_WHEELS_WHEELS_STATUS_FRAME_ID,
+                                        KSRP_WHEELS_WHEELS_STATUS_TEMPERATURE_FIELD_ID) != KSRP_STATUS_OK)
+                                return KSRP_STATUS_ERROR;
 
                     break;
                 case KSRP_WHEELS_WHEELS_STATUS_ALGORITHM_TYPE_FIELD_ID:
@@ -132,8 +171,19 @@ KSRP_Status KSRP_UpdateFrameField_Wheels_Instance(
                         return KSRP_STATUS_INVALID_DATA_SIZE;
                     }
 
+                    bool change = memcmp(&instance->wheels_status_instance.algorithm_type, value, value_size) != 0;
+
                     memcpy(&instance->wheels_status_instance.algorithm_type, value, value_size);
                     instance->wheels_status_ms_since_last_update = 0;
+
+                    if (instance->wheels_status_callback != NULL)
+                        if (change)
+                            if (instance->wheels_status_callback(
+                                        KSRP_WHEELS_SUBSYSTEM_ID,
+                                        &instance->wheels_status_instance,
+                                        KSRP_WHEELS_WHEELS_STATUS_FRAME_ID,
+                                        KSRP_WHEELS_WHEELS_STATUS_ALGORITHM_TYPE_FIELD_ID) != KSRP_STATUS_OK)
+                                return KSRP_STATUS_ERROR;
 
                     break;
                 case KSRP_WHEELS_WHEELS_STATUS_ALGORITHM_TYPE2_FIELD_ID:
@@ -141,8 +191,19 @@ KSRP_Status KSRP_UpdateFrameField_Wheels_Instance(
                         return KSRP_STATUS_INVALID_DATA_SIZE;
                     }
 
+                    bool change = memcmp(&instance->wheels_status_instance.algorithm_type2, value, value_size) != 0;
+
                     memcpy(&instance->wheels_status_instance.algorithm_type2, value, value_size);
                     instance->wheels_status_ms_since_last_update = 0;
+
+                    if (instance->wheels_status_callback != NULL)
+                        if (change)
+                            if (instance->wheels_status_callback(
+                                        KSRP_WHEELS_SUBSYSTEM_ID,
+                                        &instance->wheels_status_instance,
+                                        KSRP_WHEELS_WHEELS_STATUS_FRAME_ID,
+                                        KSRP_WHEELS_WHEELS_STATUS_ALGORITHM_TYPE2_FIELD_ID) != KSRP_STATUS_OK)
+                                return KSRP_STATUS_ERROR;
 
                     break;
                 case KSRP_WHEELS_WHEELS_STATUS_TESTBOOL_FIELD_ID:
@@ -150,18 +211,25 @@ KSRP_Status KSRP_UpdateFrameField_Wheels_Instance(
                         return KSRP_STATUS_INVALID_DATA_SIZE;
                     }
 
+                    bool change = memcmp(&instance->wheels_status_instance.testbool, value, value_size) != 0;
+
                     memcpy(&instance->wheels_status_instance.testbool, value, value_size);
                     instance->wheels_status_ms_since_last_update = 0;
+
+                    if (instance->wheels_status_callback != NULL)
+                        if (change)
+                            if (instance->wheels_status_callback(
+                                        KSRP_WHEELS_SUBSYSTEM_ID,
+                                        &instance->wheels_status_instance,
+                                        KSRP_WHEELS_WHEELS_STATUS_FRAME_ID,
+                                        KSRP_WHEELS_WHEELS_STATUS_TESTBOOL_FIELD_ID) != KSRP_STATUS_OK)
+                                return KSRP_STATUS_ERROR;
 
                     break;
                 default:
                     return KSRP_STATUS_INVALID_FIELD_TYPE;
             }
-            instance->wheels_status_callback(
-                KSRP_WHEELS_SUBSYSTEM_ID,
-                &instance->wheels_status_instance,
-                KSRP_WHEELS_WHEELS_STATUS_FRAME_ID,
-                field_id);
+
             break;
         default:
             return KSRP_STATUS_INVALID_FRAME_TYPE;

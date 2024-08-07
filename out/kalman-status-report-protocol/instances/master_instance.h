@@ -17,7 +17,7 @@ extern "C" {
 #include "kalman-status-report-protocol/common.h"
 #include "kalman-status-report-protocol/protocols/subsystems/master_protocol.h"
 
-//TODO: Subscription to frame updates (callbacks), and automatic frame sending
+//TODO: Automatic frame sending
 /**
  * @brief Instance structure for the master subsystem
  */
@@ -70,13 +70,19 @@ KSRP_Status KSRP_UpdateFrame_Master_Instance(
                 return KSRP_STATUS_INVALID_DATA_SIZE;
             }
 
+            bool change = memcmp(&instance->master_status_instance, frame, frame_size) != 0;
+
             memcpy(&instance->master_status_instance, frame, frame_size);
             instance->master_status_ms_since_last_update = 0;
-            instance->master_status_callback(
-                KSRP_MASTER_SUBSYSTEM_ID,
-                &instance->master_status_instance,
-                KSRP_MASTER_MASTER_STATUS_FRAME_ID,
-                KSRP_ILLEGAL_FIELD_ID);
+
+            if (instance->master_status_callback != NULL)
+                if (change)
+                    if (instance->master_status_callback(
+                                KSRP_MASTER_SUBSYSTEM_ID,
+                                &instance->master_status_instance,
+                                KSRP_MASTER_MASTER_STATUS_FRAME_ID,
+                                KSRP_ILLEGAL_FIELD_ID) != KSRP_STATUS_OK)
+                        return KSRP_STATUS_ERROR;
 
             break;
         }
@@ -85,13 +91,19 @@ KSRP_Status KSRP_UpdateFrame_Master_Instance(
                 return KSRP_STATUS_INVALID_DATA_SIZE;
             }
 
+            bool change = memcmp(&instance->devices_alive_instance, frame, frame_size) != 0;
+
             memcpy(&instance->devices_alive_instance, frame, frame_size);
             instance->devices_alive_ms_since_last_update = 0;
-            instance->devices_alive_callback(
-                KSRP_MASTER_SUBSYSTEM_ID,
-                &instance->devices_alive_instance,
-                KSRP_MASTER_DEVICES_ALIVE_FRAME_ID,
-                KSRP_ILLEGAL_FIELD_ID);
+
+            if (instance->devices_alive_callback != NULL)
+                if (change)
+                    if (instance->devices_alive_callback(
+                                KSRP_MASTER_SUBSYSTEM_ID,
+                                &instance->devices_alive_instance,
+                                KSRP_MASTER_DEVICES_ALIVE_FRAME_ID,
+                                KSRP_ILLEGAL_FIELD_ID) != KSRP_STATUS_OK)
+                        return KSRP_STATUS_ERROR;
 
             break;
         }
@@ -126,18 +138,25 @@ KSRP_Status KSRP_UpdateFrameField_Master_Instance(
                         return KSRP_STATUS_INVALID_DATA_SIZE;
                     }
 
+                    bool change = memcmp(&instance->master_status_instance.can_status, value, value_size) != 0;
+
                     memcpy(&instance->master_status_instance.can_status, value, value_size);
                     instance->master_status_ms_since_last_update = 0;
+
+                    if (instance->master_status_callback != NULL)
+                        if (change)
+                            if (instance->master_status_callback(
+                                        KSRP_MASTER_SUBSYSTEM_ID,
+                                        &instance->master_status_instance,
+                                        KSRP_MASTER_MASTER_STATUS_FRAME_ID,
+                                        KSRP_MASTER_MASTER_STATUS_CAN_STATUS_FIELD_ID) != KSRP_STATUS_OK)
+                                return KSRP_STATUS_ERROR;
 
                     break;
                 default:
                     return KSRP_STATUS_INVALID_FIELD_TYPE;
             }
-            instance->master_status_callback(
-                KSRP_MASTER_SUBSYSTEM_ID,
-                &instance->master_status_instance,
-                KSRP_MASTER_MASTER_STATUS_FRAME_ID,
-                field_id);
+
             break;
         case KSRP_MASTER_DEVICES_ALIVE_FRAME_ID:
             switch(field_id) {
@@ -146,18 +165,25 @@ KSRP_Status KSRP_UpdateFrameField_Master_Instance(
                         return KSRP_STATUS_INVALID_DATA_SIZE;
                     }
 
+                    bool change = memcmp(&instance->devices_alive_instance.wheels, value, value_size) != 0;
+
                     memcpy(&instance->devices_alive_instance.wheels, value, value_size);
                     instance->devices_alive_ms_since_last_update = 0;
+
+                    if (instance->devices_alive_callback != NULL)
+                        if (change)
+                            if (instance->devices_alive_callback(
+                                        KSRP_MASTER_SUBSYSTEM_ID,
+                                        &instance->devices_alive_instance,
+                                        KSRP_MASTER_DEVICES_ALIVE_FRAME_ID,
+                                        KSRP_MASTER_DEVICES_ALIVE_WHEELS_FIELD_ID) != KSRP_STATUS_OK)
+                                return KSRP_STATUS_ERROR;
 
                     break;
                 default:
                     return KSRP_STATUS_INVALID_FIELD_TYPE;
             }
-            instance->devices_alive_callback(
-                KSRP_MASTER_SUBSYSTEM_ID,
-                &instance->devices_alive_instance,
-                KSRP_MASTER_DEVICES_ALIVE_FRAME_ID,
-                field_id);
+
             break;
         default:
             return KSRP_STATUS_INVALID_FRAME_TYPE;

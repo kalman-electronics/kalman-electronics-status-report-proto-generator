@@ -159,6 +159,18 @@ KSRP_Status KSRP_Pack_Master_MasterStatus(const KSRP_Master_MasterStatus_Frame* 
     return KSRP_STATUS_OK;
 }
 
+int KSRP_Master_MasterStatus_Frame_Compare(const KSRP_Master_MasterStatus_Frame* frame1, const KSRP_Master_MasterStatus_Frame* frame2) {
+    if (frame1 == frame2) return 0;
+    if (frame1 == NULL) return -1;
+    if (frame2 == NULL) return 1;
+    if (frame1->can_status < frame2->can_status) {
+        return -1;
+    } else if (frame1->can_status > frame2->can_status) {
+        return 1;
+    }
+
+    return 0;
+}
 
 /////////////////////////////////////////////////////////////////////////////////
 /// MasterStatus Setters
@@ -387,6 +399,18 @@ KSRP_Status KSRP_Pack_Master_DevicesAlive(const KSRP_Master_DevicesAlive_Frame* 
     return KSRP_STATUS_OK;
 }
 
+int KSRP_Master_DevicesAlive_Frame_Compare(const KSRP_Master_DevicesAlive_Frame* frame1, const KSRP_Master_DevicesAlive_Frame* frame2) {
+    if (frame1 == frame2) return 0;
+    if (frame1 == NULL) return -1;
+    if (frame2 == NULL) return 1;
+    if (frame1->wheels < frame2->wheels) {
+        return -1;
+    } else if (frame1->wheels > frame2->wheels) {
+        return 1;
+    }
+
+    return 0;
+}
 
 /////////////////////////////////////////////////////////////////////////////////
 /// DevicesAlive Setters
