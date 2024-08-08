@@ -13,9 +13,9 @@ extern "C" {
 #include <stdbool.h>
 
 // Include user libraries
-#include "kalman-status-report-protocol/frames.h"
-#include "kalman-status-report-protocol/common.h"
-#include "kalman-status-report-protocol/protocols/protocol_common.h"
+#include "ksrp/frames.h"
+#include "ksrp/common.h"
+#include "ksrp/protocols/protocol_common.h"
 
 // Enum for all frame IDs in given subsystem
 // ASSUMPTION: Values won't exceed 1 byte (255)
@@ -210,6 +210,13 @@ KSRP_Status KSRP_Pack_Wheels_WheelsStatus(const KSRP_Wheels_WheelsStatus_Frame* 
     return KSRP_STATUS_OK;
 }
 
+/**
+ * @brief Compare two WHEELS_STATUS frames
+ *
+ * @param frame1 The first frame to compare
+ * @param frame2 The second frame to compare
+ * @return int 0 if the frames are equal, -1 if frame1 is less than frame2, 1 if frame1 is greater than frame2
+ */
 int KSRP_Wheels_WheelsStatus_Frame_Compare(const KSRP_Wheels_WheelsStatus_Frame* frame1, const KSRP_Wheels_WheelsStatus_Frame* frame2) {
     if (frame1 == frame2) return 0;
     if (frame1 == NULL) return -1;

@@ -10,7 +10,7 @@ extern "C" {
 #include <stdbool.h>
 
 // Include user libraries
-#include "kalman-status-report-protocol/frames.h"
+#include "ksrp/frames.h"
 
 // Enum for ID of each subsystem
 // ASSUMPTION: values won't exceed 255

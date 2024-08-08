@@ -12,13 +12,12 @@ def generate_devices_protocols(protocols):
     jinja_env = Environment(loader=FileSystemLoader(args.templates))
 
     for protocol_name, protocol in protocols.items():
-
         template = jinja_env.get_template('protocol_file_template.h.jinja2')
         c_code = template.render(protocol=protocol,
                                  clibraries=["stdint.h", "stdbool.h"],
-                                 libraries=["kalman-status-report-protocol/frames.h",
-                                            "kalman-status-report-protocol/common.h",
-                                            "kalman-status-report-protocol/protocols/protocol_common.h"],
+                                 libraries=["ksrp/frames.h",
+                                            "ksrp/common.h",
+                                            "ksrp/protocols/protocol_common.h"],
                                  allowed_types=ALLOWED_TYPES)
         devices_protocols_c_codes[f"protocols/subsystems/{protocol_name}_protocol.h"] = c_code
 
@@ -30,7 +29,7 @@ def generate_common_protocol(protocols):
     template = jinja_env.get_template('common_protocol_file_template.h.jinja2')
     c_code = template.render(protocols=protocols,
                              clibraries=["stdint.h", "stdbool.h"],
-                             libraries=["kalman-status-report-protocol/frames.h"])
+                             libraries=["ksrp/frames.h"])
     return {Path("protocols/protocol_common.h"): c_code}
 
 
@@ -38,7 +37,7 @@ def generate_util_protocol(paths, protocols):
     jinja_env = Environment(loader=FileSystemLoader(args.templates))
     template = jinja_env.get_template('util_protocol_file_template.h.jinja2')
     c_code = template.render(clibraries=["stdint.h", "stdbool.h"],
-                             libraries=["kalman-status-report-protocol/" + path for path in paths],
+                             libraries=["ksrp/" + path for path in paths],
                              protocols=protocols.values())
     return {Path("protocols/protocol_utils.h"): c_code}
 
@@ -50,9 +49,9 @@ def generate_instances(protocols):
     for protocol_name, protocol in protocols.items():
         c_code = template.render(protocol=protocol,
                                  clibraries=["stdint.h", "stdbool.h"],
-                                 libraries=["kalman-status-report-protocol/frames.h",
-                                            "kalman-status-report-protocol/common.h",
-                                            f"kalman-status-report-protocol/protocols/subsystems/{protocol_name}_protocol.h"])
+                                 libraries=["ksrp/frames.h",
+                                            "ksrp/common.h",
+                                            f"ksrp/protocols/subsystems/{protocol_name}_protocol.h"])
         devices_instances_c_codes[f"instances/{protocol_name}_instance.h"] = c_code
 
     return devices_instances_c_codes
@@ -89,7 +88,8 @@ if __name__ == '__main__':
 
     copy_tree('library_source', args.output)
 
-    output_path = os.path.join(args.output, 'kalman-status-report-protocol')
+    output_path = os.path.join(args.output, 'ksrp')
+
     save_c_codes(devices_protocols_c_codes, output_path)
     save_c_codes(generate_common_protocol(protocols.values()), output_path)
     save_c_codes(generate_util_protocol(devices_protocols_c_codes.keys(), protocols), output_path)

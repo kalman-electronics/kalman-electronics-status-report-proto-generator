@@ -13,9 +13,9 @@ extern "C" {
 #include <stdbool.h>
 
 // Include user libraries
-#include "kalman-status-report-protocol/frames.h"
-#include "kalman-status-report-protocol/common.h"
-#include "kalman-status-report-protocol/protocols/subsystems/wheels_protocol.h"
+#include "ksrp/frames.h"
+#include "ksrp/common.h"
+#include "ksrp/protocols/subsystems/wheels_protocol.h"
 
 //TODO: Automatic frame sending
 /**
@@ -271,6 +271,14 @@ uint32_t KSRP_Wheels_Instance_GetTimeSinceLastUpdate(
     }
 }
 
+/**
+ * @brief Set the callback for a frame in the instance, callback is called when frame value is changed
+ *
+ * @param instance The instance to set the callback for
+ * @param frame_id The ID of the frame to set the callback for
+ * @param callback The callback function to set
+ * @return KSRP_Status The status of the operation, KSRP_STATUS_OK if successful
+ */
 _nonnull_
 KSRP_Status KSRP_Wheels_Instance_SetCallback(
     KSRP_Wheels_Instance* instance,

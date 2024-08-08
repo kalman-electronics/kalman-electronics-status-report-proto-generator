@@ -14,8 +14,8 @@ extern "C" {
 #include <stdbool.h>
 
 // Include user libraries
-#include "kalman-status-report-protocol/protocols/subsystems/master_protocol.h"
-#include "kalman-status-report-protocol/protocols/subsystems/wheels_protocol.h"
+#include "ksrp/protocols/subsystems/master_protocol.h"
+#include "ksrp/protocols/subsystems/wheels_protocol.h"
 
 /**
  * @brief Verify the type ID of a frame

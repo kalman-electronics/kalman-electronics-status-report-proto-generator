@@ -1,0 +1,11 @@
+
+// Include standard libraries
+{%- for clib in clibraries %}
+    #include <{{ clib }}>
+{%- endfor %}
+
+// Include user libraries
+{%- for lib in libraries %}
+    #include "{{ lib }}"
+{%- endfor %}
+
