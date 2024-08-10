@@ -18,10 +18,11 @@ def generate_specific_files(protocols):
             'protocols': protocols.values()}),
         ('instance_file_template.h.jinja2', 'include/ksrp/instances/{protocol_name}_instance.h', {
             'clibraries': ["stdint.h", "stdbool.h"],
-            'libraries': ["ksrp/frames.h", "ksrp/common.h", "ksrp/protocols/protocol_utils.h"],
+            'libraries': ["ksrp/frames.h", "ksrp/common.h",
+                          "include/ksrp/protocols/subsystems/{protocol_name}_protocol.h"],
             'protocols': protocols.values()}),
         ('instance_file_template.c.jinja2', 'src/ksrp/instances/{protocol_name}_instance.c', {
-            'libraries': ["ksrp/protocols/subsystems/{protocol_name}_instance.h"],
+            'libraries': ["ksrp/instances/{protocol_name}_instance.h"],
             'protocols': protocols.values()})
     ]
 

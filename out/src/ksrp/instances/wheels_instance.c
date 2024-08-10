@@ -4,7 +4,7 @@
  */// Include standard libraries
 
 // Include user libraries
-#include "ksrp/protocols/subsystems/master_instance.h"
+#include "ksrp/instances/master_instance.h"
 
 /**
  * @brief Initialize all frames in the instance

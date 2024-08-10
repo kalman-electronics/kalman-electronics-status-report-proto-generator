@@ -15,7 +15,7 @@ extern "C" {
 // Include user libraries
 #include "ksrp/frames.h"
 #include "ksrp/common.h"
-#include "ksrp/protocols/protocol_utils.h"
+#include "include/ksrp/protocols/subsystems/master_protocol.h"
 
 //TODO: Automatic frame sending
 /**
