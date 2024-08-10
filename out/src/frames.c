@@ -1,4 +1,4 @@
-#include "common.h"
+#include "ksrp/frames.h"
 
 void KSRP_RawDataFrame_Init(KSRP_RawData_Frame* raw_data, uint8_t* data, uint8_t capacity) {
     raw_data->data = data;

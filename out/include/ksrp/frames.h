@@ -8,7 +8,7 @@ extern "C" {
 #include <stdint.h>
 #include <string.h>
 
-#include "common.h"
+#include "ksrp/common.h"
 
 typedef struct {
     uint8_t* data;

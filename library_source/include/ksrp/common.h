@@ -31,7 +31,7 @@ typedef enum {
 
 #define KSRP_ILLEGAL_FRAME_ID 0xFFFFFFFF
 #define KSRP_ILLEGAL_FIELD_ID 0xFFFFFFFF
-typedef KSRP_Status (*KSRP_FrameUpdateCallback)(KSRP_SubsystemID subsystem_id, void* frame_instance, uint32_t frame_id, uint32_t field_id);
+typedef KSRP_Status (*KSRP_FrameUpdateCallback)(uint32_t subsystem_id, void* frame_instance, uint32_t frame_id, uint32_t field_id);
 
 #ifdef __cplusplus
 }
