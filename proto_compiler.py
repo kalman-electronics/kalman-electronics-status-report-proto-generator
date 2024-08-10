@@ -32,9 +32,10 @@ def generate_specific_files(protocols):
     for template_file, output_file, context in SPECIFIC_FILES:
         template = jinja_env.get_template(template_file)
         for protocol_name, protocol in protocols.items():
-            context['libraries'] = [lib.format(protocol_name=protocol_name) for lib in context['libraries']]
+            ctx = context.copy()
 
-            c_code = template.render(protocol=protocol, protocol_name=protocol_name, **context)
+            ctx['libraries'] = [lib.format(protocol_name=protocol_name) for lib in context['libraries']]
+            c_code = template.render(protocol=protocol, **ctx)
             devices_protocols_c_codes[output_file.format(protocol_name=protocol_name)] = c_code
 
     return devices_protocols_c_codes
