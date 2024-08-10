@@ -1,10 +1,10 @@
 /**
-* @file wheels_status_report.c
-* @brief Status report protocol implementation for wheels subsystem
-*/// Include standard libraries
+ * @file wheels_status_report.c
+ * @brief Status report protocol implementation for wheels subsystem
+ */// Include standard libraries
 
 // Include user libraries
-    #include "ksrp/protocols/subsystems/{protocol_name}_protocol.h"
+#include "ksrp/protocols/subsystems/master_protocol.h"
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////

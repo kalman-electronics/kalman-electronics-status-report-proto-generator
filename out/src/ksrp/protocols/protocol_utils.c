@@ -6,7 +6,7 @@
 // Include standard libraries
 
 // Include user libraries
-    #include "ksrp/protocols/protocol_utils.h"
+#include "ksrp/protocols/protocol_utils.h"
 
 /**
  * @brief Verify the type ID of a frame

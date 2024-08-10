@@ -1,10 +1,10 @@
 /**
-* @file master_status_report.c
-* @brief Status report protocol implementation for master subsystem
-*/// Include standard libraries
+ * @file master_status_report.c
+ * @brief Status report protocol implementation for master subsystem
+ */// Include standard libraries
 
 // Include user libraries
-    #include "ksrp/protocols/subsystems/{protocol_name}_protocol.h"
+#include "ksrp/protocols/subsystems/master_protocol.h"
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////

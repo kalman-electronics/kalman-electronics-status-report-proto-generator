@@ -1,19 +1,19 @@
 /**
-* @file {{ protocol.subsystem }}_status_report.c
-* @brief Status report protocol implementation for {{ protocol.subsystem }} subsystem
-*/
+ * @file {{ protocol.subsystem }}_status_report.c
+ * @brief Status report protocol implementation for {{ protocol.subsystem }} subsystem
+ */
 {%- macro snake_to_camel(snake_case_str) -%}
     {{ snake_case_str |  replace('_', ' ') | title | replace('_', '') | replace(' ', '') }}
 {%- endmacro -%}
 
 // Include standard libraries
 {%- for clib in clibraries %}
-    #include <{{ clib }}>
+#include <{{ clib }}>
 {%- endfor %}
 
 // Include user libraries
 {%- for lib in libraries %}
-    #include "{{ lib }}"
+#include "{{ lib }}"
 {%- endfor %}
 
 {% for frame in protocol.frames -%}
