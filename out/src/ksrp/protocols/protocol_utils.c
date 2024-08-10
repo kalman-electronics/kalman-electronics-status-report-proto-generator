@@ -1,21 +1,12 @@
 /**
- * @file protocol_util.h
+ * @file protocol_util.c
  * @brief Utility functions for the Kalman Status Report protocol
  */
-#ifndef KALMAN_STATUS_REPORT_UTIL_H_
-#define KALMAN_STATUS_REPORT_UTIL_H_
-
-#ifdef __cplusplus
-extern "C" {
-#endif // __cplusplus
 
 // Include standard libraries
-#include <stdint.h>
-#include <stdbool.h>
 
 // Include user libraries
-#include "ksrp/protocols/subsystems/master_protocol.h"
-#include "ksrp/protocols/subsystems/wheels_protocol.h"
+    #include "ksrp/protocols/protocol_utils.h"
 
 /**
  * @brief Verify the type ID of a frame
@@ -39,9 +30,3 @@ KSRP_TypeID KSRP_VerifyTypeID(const KSRP_RawData_Frame* frame) {
 
     return KSRP_ILLEGAL_TYPE_ID;
 }
-
-#ifdef __cplusplus
-}
-#endif // __cplusplus
-
-#endif // KALMAN_STATUS_REPORT_UTIL_H_

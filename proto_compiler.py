@@ -7,54 +7,60 @@ from yaml_parser import Parser, ALLOWED_TYPES
 from distutils.dir_util import copy_tree
 
 
-def generate_devices_protocols(protocols):
+def generate_specific_files(protocols):
+    SPECIFIC_FILES = [
+        ('protocol_file_template.h.jinja2', 'include/ksrp/protocols/subsystems/{protocol_name}_protocol.h', {
+            'clibraries': ["stdint.h", "stdbool.h"],
+            'libraries': ["ksrp/frames.h", "ksrp/common.h"],
+            'protocols': protocols.values()}),
+        ('protocol_file_template.c.jinja2', 'src/ksrp/protocols/subsystems/{protocol_name}_protocol.c', {
+            'libraries': ["ksrp/protocols/subsystems/{protocol_name}_protocol.h"],
+            'protocols': protocols.values()}),
+        ('instance_file_template.h.jinja2', 'include/ksrp/instances/{protocol_name}_instance.h', {
+            'clibraries': ["stdint.h", "stdbool.h"],
+            'libraries': ["ksrp/frames.h", "ksrp/common.h", "ksrp/protocols/protocol_utils.h"],
+            'protocols': protocols.values()}),
+        ('instance_file_template.c.jinja2', 'src/ksrp/instances/{protocol_name}_instance.c', {
+            'libraries': ["ksrp/protocols/subsystems/{protocol_name}_instance.h"],
+            'protocols': protocols.values()})
+    ]
+
     devices_protocols_c_codes = {}
     jinja_env = Environment(loader=FileSystemLoader(args.templates))
 
-    for protocol_name, protocol in protocols.items():
-        template = jinja_env.get_template('protocol_file_template.h.jinja2')
-        c_code = template.render(protocol=protocol,
-                                 clibraries=["stdint.h", "stdbool.h"],
-                                 libraries=["ksrp/frames.h",
-                                            "ksrp/common.h",
-                                            "ksrp/protocols/protocol_common.h"],
-                                 allowed_types=ALLOWED_TYPES)
-        devices_protocols_c_codes[f"protocols/subsystems/{protocol_name}_protocol.h"] = c_code
+    for template_file, output_file, context in SPECIFIC_FILES:
+        template = jinja_env.get_template(template_file)
+        for protocol_name, protocol in protocols.items():
+            c_code = template.render(protocol=protocol, protocol_name=protocol_name, **context)
+            devices_protocols_c_codes[output_file.format(protocol_name=protocol_name)] = c_code
 
     return devices_protocols_c_codes
 
 
-def generate_common_protocol(protocols):
+def generate_common_files(protocols):
+    COMMON_FILES = [
+        ('common_protocol_file_template.h.jinja2', 'include/ksrp/protocols/protocol_common.h', {
+            'clibraries': ["stdint.h", "stdbool.h"],
+            'libraries': ["ksrp/frames.h", "ksrp/common.h"],
+            'protocols': protocols.values()}),
+        ('util_protocol_file_template.h.jinja2', 'include/ksrp/protocols/protocol_utils.h', {
+            'clibraries': ["stdint.h", "stdbool.h"],
+            'libraries': ["ksrp/frames.h", "ksrp/common.h"] + [f"ksrp/protocols/subsystems/{protocol_name}_protocol.h" for protocol_name in protocols.keys()],
+            'protocols': protocols.values()}),
+        ('util_protocol_file_template.c.jinja2', 'src/ksrp/protocols/protocol_utils.c', {
+            'libraries': ["ksrp/protocols/protocol_utils.h"],
+            'protocols': protocols.values()})
+    ]
+
+    devices_protocols_c_codes = {}
     jinja_env = Environment(loader=FileSystemLoader(args.templates))
-    template = jinja_env.get_template('common_protocol_file_template.h.jinja2')
-    c_code = template.render(protocols=protocols,
-                             clibraries=["stdint.h", "stdbool.h"],
-                             libraries=["ksrp/frames.h"])
-    return {Path("protocols/protocol_common.h"): c_code}
 
+    for template_file, output_file, context in COMMON_FILES:
+        template = jinja_env.get_template(template_file)
+        c_code = template.render(**context)
+        devices_protocols_c_codes[output_file] = c_code
 
-def generate_util_protocol(paths, protocols):
-    jinja_env = Environment(loader=FileSystemLoader(args.templates))
-    template = jinja_env.get_template('util_protocol_file_template.h.jinja2')
-    c_code = template.render(clibraries=["stdint.h", "stdbool.h"],
-                             libraries=["ksrp/" + path for path in paths],
-                             protocols=protocols.values())
-    return {Path("protocols/protocol_utils.h"): c_code}
-
-
-def generate_instances(protocols):
-    devices_instances_c_codes = {}
-    jinja_env = Environment(loader=FileSystemLoader(args.templates))
-    template = jinja_env.get_template('instance_file_template.h.jinja2')
-    for protocol_name, protocol in protocols.items():
-        c_code = template.render(protocol=protocol,
-                                 clibraries=["stdint.h", "stdbool.h"],
-                                 libraries=["ksrp/frames.h",
-                                            "ksrp/common.h",
-                                            f"ksrp/protocols/subsystems/{protocol_name}_protocol.h"])
-        devices_instances_c_codes[f"instances/{protocol_name}_instance.h"] = c_code
-
-    return devices_instances_c_codes
+    return devices_protocols_c_codes
 
 
 def save_c_codes(c_codes, path):
@@ -84,13 +90,8 @@ if __name__ == '__main__':
         parser.load_from_yaml(os.path.join(args.source, file))
 
     protocols = parser.get_protocols()
-    devices_protocols_c_codes = generate_devices_protocols(protocols)
 
     copy_tree('library_source', args.output)
 
-    output_path = os.path.join(args.output, 'ksrp')
-
-    save_c_codes(devices_protocols_c_codes, output_path)
-    save_c_codes(generate_common_protocol(protocols.values()), output_path)
-    save_c_codes(generate_util_protocol(devices_protocols_c_codes.keys(), protocols), output_path)
-    save_c_codes(generate_instances(protocols), output_path)
+    save_c_codes(generate_specific_files(protocols), args.output)
+    save_c_codes(generate_common_files(protocols), args.output)

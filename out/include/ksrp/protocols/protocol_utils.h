@@ -10,14 +10,14 @@ extern "C" {
 #endif // __cplusplus
 
 // Include standard libraries
-{%- for clib in clibraries %}
-#include <{{ clib }}>
-{%- endfor %}
+#include <stdint.h>
+#include <stdbool.h>
 
 // Include user libraries
-{%- for lib in libraries %}
-#include "{{ lib }}"
-{%- endfor %}
+#include "ksrp/frames.h"
+#include "ksrp/common.h"
+#include "ksrp/protocols/subsystems/master_protocol.h"
+#include "ksrp/protocols/subsystems/wheels_protocol.h"
 
 /**
  * @brief Verify the type ID of a frame

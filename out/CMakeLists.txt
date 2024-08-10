@@ -1,6 +1,7 @@
-project(kalman-status-report-protocol)
+project(ksrp)
 
-include_directories(kalman-status-report-protocol)
+add_library(ksrp INTERFACE)
+add_subdirectory(src)
 
-add_library(kalman-status-report-protocol INTERFACE)
-target_include_directories(kalman-status-report-protocol INTERFACE kalman-status-report-protocol)
+target_include_directories(ksrp INTERFACE "include/ksrp")
+target_link_libraries(ksrp INTERFACE)

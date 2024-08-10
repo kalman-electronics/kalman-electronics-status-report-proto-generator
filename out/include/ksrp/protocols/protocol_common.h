@@ -11,6 +11,7 @@ extern "C" {
 
 // Include user libraries
 #include "ksrp/frames.h"
+#include "ksrp/common.h"
 
 // Enum for ID of each subsystem
 // ASSUMPTION: values won't exceed 255

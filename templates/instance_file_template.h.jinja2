@@ -45,14 +45,7 @@ typedef struct {
  * @return KSRP_Status The status of the initialization, KSRP_STATUS_OK if successful
  */
 _nonnull_
-KSRP_Status KSRP_Init_{{ snake_to_camel(protocol.subsystem) }}_Instance(KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance* instance) {
-    {%- for frame in protocol.frames %}
-    if (KSRP_Init_{{ snake_to_camel(protocol.subsystem) }}_{{ snake_to_camel(frame.name) }}_Frame(&instance->{{ frame.name }}_instance) != KSRP_STATUS_OK) {
-        return KSRP_STATUS_ERROR;
-    }
-    {%- endfor  %}
-    return KSRP_STATUS_OK;
-}
+KSRP_Status KSRP_Init_{{ snake_to_camel(protocol.subsystem) }}_Instance(KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance* instance);
 
 /**
  * @brief Update a frame in the instance
@@ -67,38 +60,7 @@ _nonnull_
 KSRP_Status KSRP_UpdateFrame_{{ snake_to_camel(protocol.subsystem) }}_Instance(
     KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance* instance,
     KSRP_{{ snake_to_camel(protocol.subsystem) }}_FrameID frame_id,
-    void* frame, size_t frame_size) {
-
-    switch(frame_id) {
-        {%- for frame in protocol.frames %}
-        case KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_FRAME_ID: {
-            if (frame_size != KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_FRAME_SIZE) {
-                return KSRP_STATUS_INVALID_DATA_SIZE;
-            }
-
-            bool change = memcmp(&instance->{{ frame.name }}_instance, frame, frame_size) != 0;
-
-            memcpy(&instance->{{ frame.name }}_instance, frame, frame_size);
-            instance->{{ frame.name }}_ms_since_last_update = 0;
-
-            if (instance->{{ frame.name }}_callback != NULL)
-                if (change)
-                    if (instance->{{ frame.name }}_callback(
-                                KSRP_{{ protocol.subsystem | upper }}_SUBSYSTEM_ID,
-                                &instance->{{ frame.name }}_instance,
-                                KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_FRAME_ID,
-                                KSRP_ILLEGAL_FIELD_ID) != KSRP_STATUS_OK)
-                        return KSRP_STATUS_ERROR;
-
-            break;
-        }
-        {%- endfor %}
-        default:
-            return KSRP_STATUS_INVALID_FRAME_TYPE;
-    }
-
-    return KSRP_STATUS_OK;
-}
+    void* frame, size_t frame_size);
 
 /**
  * @brief Update a field in a frame in the instance
@@ -114,48 +76,7 @@ _nonnull_
 KSRP_Status KSRP_UpdateFrameField_{{ snake_to_camel(protocol.subsystem) }}_Instance(
     KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance* instance,
     KSRP_{{ snake_to_camel(protocol.subsystem) }}_FrameID frame_id, uint32_t field_id,
-    void* value, size_t value_size) {
-
-    switch(frame_id) {
-        {%- for frame in protocol.frames %}
-        case KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_FRAME_ID:
-            switch(field_id) {
-            {%- for field in frame.fields %}
-                case KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_{{ field.name | upper }}_FIELD_ID:
-                    if (value_size != sizeof(instance->{{ frame.name }}_instance.{{ field.name }})) {
-                        return KSRP_STATUS_INVALID_DATA_SIZE;
-                    }
-
-                    bool change = memcmp(&instance->{{ frame.name }}_instance.{{ field.name }}, value, value_size) != 0;
-
-                    memcpy(&instance->{{ frame.name }}_instance.{{ field.name }}, value, value_size);
-                    instance->{{ frame.name }}_ms_since_last_update = 0;
-
-                    if (instance->{{ frame.name }}_callback != NULL)
-                        if (change)
-                            if (instance->{{ frame.name }}_callback(
-                                        KSRP_{{ protocol.subsystem | upper }}_SUBSYSTEM_ID,
-                                        &instance->{{ frame.name }}_instance,
-                                        KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_FRAME_ID,
-                                        KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_{{ field.name | upper }}_FIELD_ID) != KSRP_STATUS_OK)
-                                return KSRP_STATUS_ERROR;
-
-                    break;
-                {%- endfor %}
-                default:
-                    return KSRP_STATUS_INVALID_FIELD_TYPE;
-            }
-
-            break;
-            {%- for field in frame.fields %}
-
-            {%- endfor %}
-        {%- endfor %}
-        default:
-            return KSRP_STATUS_INVALID_FRAME_TYPE;
-    }
-    return KSRP_STATUS_OK;
-}
+    void* value, size_t value_size);
 
 /**
  * @brief Update the time since last update for all frames in the instance
@@ -166,14 +87,8 @@ KSRP_Status KSRP_UpdateFrameField_{{ snake_to_camel(protocol.subsystem) }}_Insta
  */
 _nonnull_
 KSRP_Status KSRP_UpdateTime_{{ snake_to_camel(protocol.subsystem) }}_Instance(
-    KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance* instance, uint32_t ms_since_last_update) {
-
-    {%- for frame in protocol.frames %}
-    instance->{{ frame.name }}_ms_since_last_update += ms_since_last_update;
-    {%- endfor %}
-
-    return KSRP_STATUS_OK;
-}
+    KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance* instance,
+    uint32_t ms_since_last_update);
 
 /**
  * @brief Get the time since last update for a frame in the instance
@@ -184,17 +99,8 @@ KSRP_Status KSRP_UpdateTime_{{ snake_to_camel(protocol.subsystem) }}_Instance(
  */
 _nonnull_
 uint32_t KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance_GetTimeSinceLastUpdate(
-    KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance* instance, KSRP_{{ snake_to_camel(protocol.subsystem) }}_FrameID frame_id) {
-
-    switch(frame_id) {
-        {%- for frame in protocol.frames %}
-        case KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_FRAME_ID:
-            return instance->{{ frame.name }}_ms_since_last_update;
-        {%- endfor %}
-        default:
-            return 0xFFFFFFFF;
-    }
-}
+    KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance* instance,
+    KSRP_{{ snake_to_camel(protocol.subsystem) }}_FrameID frame_id);
 
 /**
  * @brief Set the callback for a frame in the instance, callback is called when frame value is changed
@@ -208,20 +114,7 @@ _nonnull_
 KSRP_Status KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance_SetCallback(
     KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance* instance,
     KSRP_{{ snake_to_camel(protocol.subsystem) }}_FrameID frame_id,
-    KSRP_FrameUpdateCallback callback) {
-
-    switch(frame_id) {
-        {%- for frame in protocol.frames %}
-        case KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_FRAME_ID:
-            instance->{{ frame.name }}_callback = callback;
-            break;
-        {%- endfor %}
-        default:
-            return KSRP_STATUS_INVALID_FRAME_TYPE;
-    }
-
-    return KSRP_STATUS_OK;
-}
+    KSRP_FrameUpdateCallback callback);
 
 #ifdef __cplusplus
 }

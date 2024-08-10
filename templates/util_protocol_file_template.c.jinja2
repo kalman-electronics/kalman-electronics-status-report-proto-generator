@@ -1,3 +1,7 @@
+/**
+ * @file protocol_util.c
+ * @brief Utility functions for the Kalman Status Report protocol
+ */
 
 // Include standard libraries
 {%- for clib in clibraries %}
@@ -8,3 +12,26 @@
 {%- for lib in libraries %}
     #include "{{ lib }}"
 {%- endfor %}
+
+/**
+ * @brief Verify the type ID of a frame
+ *
+ * @param frame The frame to verify
+ * @return KSRP_TypeID The type ID of the frame
+ */
+KSRP_TypeID KSRP_VerifyTypeID(const KSRP_RawData_Frame* frame) {
+    if (frame->length < KSRP_ID_BYTES) {
+        return KSRP_ILLEGAL_TYPE_ID;
+    }
+
+    switch (KSRP_RawData_Frame_GetTypeID(frame)) {
+        {%- for protocol in protocols %}
+            {%- for frame in protocol.frames %}
+        case KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_TYPE_ID:
+            return KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_TYPE_ID;
+            {%- endfor  %}
+        {%- endfor %}
+    }
+
+    return KSRP_ILLEGAL_TYPE_ID;
+}

@@ -1,27 +1,10 @@
 /**
- * @file wheels_status_report.h
- * @brief Status report protocol definitions for wheels subsystem
- */#ifndef KALMAN_STATUS_REPORT_WHEELS_H_
-#define KALMAN_STATUS_REPORT_WHEELS_H_
-
-#ifdef __cplusplus
-extern "C" {
-#endif //__cplusplus
-
-// Include standard libraries
-#include <stdint.h>
-#include <stdbool.h>
+* @file wheels_status_report.c
+* @brief Status report protocol implementation for wheels subsystem
+*/// Include standard libraries
 
 // Include user libraries
-#include "ksrp/frames.h"
-#include "ksrp/common.h"
-#include "ksrp/protocols/protocol_common.h"
-
-// Enum for all frame IDs in given subsystem
-// ASSUMPTION: Values won't exceed 1 byte (255)
-typedef enum {
-    KSRP_WHEELS_WHEELS_STATUS_FRAME_ID = 12,
-} KSRP_Wheels_FrameID;
+    #include "ksrp/protocols/subsystems/{protocol_name}_protocol.h"
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -30,75 +13,6 @@ typedef enum {
 /** @defgroup WheelsStatus frame protocol
  *  @{
  */
-
-/**
- * @brief Health check value mappings for results in WheelsStatus frame
- */
-typedef enum {
-    KSRP_WHEELS_WHEELS_STATUS_DRIVER_STATUS_HEALTH_CHECK_OK_1 = 0,
-    KSRP_WHEELS_WHEELS_STATUS_DRIVER_STATUS_HEALTH_CHECK_CRITICAL_2 = 255,
-} KSRP_Wheels_WheelsStatus_DriverStatus_HealthCheck;
-
-/**
- * @brief Health check value mappings for results in WheelsStatus frame
- */
-typedef enum {       
-    KSRP_WHEELS_WHEELS_STATUS_TEMPERATURE_HEALTH_CHECK_OK_1_MIN = 0,
-    KSRP_WHEELS_WHEELS_STATUS_TEMPERATURE_HEALTH_CHECK_OK_1_MAX = 100,       
-    KSRP_WHEELS_WHEELS_STATUS_TEMPERATURE_HEALTH_CHECK_WARNING_2_MIN = 100,
-    KSRP_WHEELS_WHEELS_STATUS_TEMPERATURE_HEALTH_CHECK_WARNING_2_MAX = 200,       
-    KSRP_WHEELS_WHEELS_STATUS_TEMPERATURE_HEALTH_CHECK_CRITICAL_3_MIN = 200,
-    KSRP_WHEELS_WHEELS_STATUS_TEMPERATURE_HEALTH_CHECK_CRITICAL_3_MAX = 300,
-} KSRP_Wheels_WheelsStatus_Temperature_HealthCheck;
-
-
-/**
- * @brief Health check troubleshooting descriptions for WheelsStatus frame
- */
-
-/**
- * @brief Health check descriptions for WheelsStatus frame
- */
-#define KSRP_WHEELS_WHEELS_STATUS_DRIVER_STATUS_HEALTH_CHECK_OK_1_DESCRIPTION "Driver is ready"
-#define KSRP_WHEELS_WHEELS_STATUS_DRIVER_STATUS_HEALTH_CHECK_CRITICAL_2_DESCRIPTION "Driver is not ready"
-#define KSRP_WHEELS_WHEELS_STATUS_TEMPERATURE_HEALTH_CHECK_OK_1_DESCRIPTION "Temperature is normal"
-#define KSRP_WHEELS_WHEELS_STATUS_TEMPERATURE_HEALTH_CHECK_WARNING_2_DESCRIPTION "Temperature is high"
-#define KSRP_WHEELS_WHEELS_STATUS_TEMPERATURE_HEALTH_CHECK_CRITICAL_3_DESCRIPTION "Temperature is very high"
-
-/**
- * @brief Enum value declarations for algorithm_type in WheelsStatus frame
- */
-typedef enum {
-    KSRP_WHEELS_WHEELS_STATUS_ALGORITHM_TYPE_POSITION,
-    KSRP_WHEELS_WHEELS_STATUS_ALGORITHM_TYPE_VELOCITY,
-    KSRP_WHEELS_WHEELS_STATUS_ALGORITHM_TYPE_TORQUE,
-} KSRP_Wheels_WheelsStatus_AlgorithmType;
-
-/**
- * @brief Enum value declarations for algorithm_type2 in WheelsStatus frame
- */
-typedef enum {
-    KSRP_WHEELS_WHEELS_STATUS_ALGORITHM_TYPE2_POSITION = 1,
-    KSRP_WHEELS_WHEELS_STATUS_ALGORITHM_TYPE2_VELOCITY = 2,
-    KSRP_WHEELS_WHEELS_STATUS_ALGORITHM_TYPE2_TORQUE = 3,
-} KSRP_Wheels_WheelsStatus_AlgorithmType2;
-
-/**
- * @brief WheelsStatus Frame definition
- */
-typedef struct _packed_ {
-    uint8_t device_id;
-    uint8_t driver_status;
-    float temperature;
-    uint8_t algorithm_type;
-    uint8_t algorithm_type2;
-    uint8_t testbool;
-} KSRP_Wheels_WheelsStatus_Frame;
-
-/// @brief Type ID for WheelsStatus frame
-#define KSRP_WHEELS_WHEELS_STATUS_TYPE_ID ( \
-    KSRP_MAKE_TYPE_ID(KSRP_WHEELS_SUBSYSTEM_ID, \
-    KSRP_WHEELS_WHEELS_STATUS_FRAME_ID))
 
 /**
  * @brief Check if a type ID is an instance of WheelsStatus frame
@@ -120,21 +34,6 @@ bool KSRP_IsRawDataInstanceof_Wheels_WheelsStatus(const KSRP_RawData_Frame* raw_
     return raw_data->length == sizeof(KSRP_Wheels_WheelsStatus_Frame) + KSRP_ID_BYTES &&
         KSRP_IsTypeIDInstanceof_Wheels_WheelsStatus(KSRP_MAKE_TYPE_ID(raw_data->data[0], raw_data->data[1]));
 }
-
-/// @brief Size of WheelsStatus frame
-#define KSRP_WHEELS_WHEELS_STATUS_FRAME_SIZE sizeof(KSRP_Wheels_WheelsStatus_Frame)
-
-/**
- * @brief Enum with field IDs for WheelsStatus frame
- */
-typedef enum {
-    KSRP_WHEELS_WHEELS_STATUS_DEVICE_ID_FIELD_ID,
-    KSRP_WHEELS_WHEELS_STATUS_DRIVER_STATUS_FIELD_ID,
-    KSRP_WHEELS_WHEELS_STATUS_TEMPERATURE_FIELD_ID,
-    KSRP_WHEELS_WHEELS_STATUS_ALGORITHM_TYPE_FIELD_ID,
-    KSRP_WHEELS_WHEELS_STATUS_ALGORITHM_TYPE2_FIELD_ID,
-    KSRP_WHEELS_WHEELS_STATUS_TESTBOOL_FIELD_ID,
-} KSRP_Wheels_WheelsStatus_FieldID;
 
 /////////////////////////////////////////////////////////////////////////////////
 /// WheelsStatus Frame Construction
@@ -503,10 +402,3 @@ const char* KSRP_HealthCheckDescription_Wheels_WheelsStatus_Temperature(const KS
  * @}
  */
 
-
-
-#ifdef __cplusplus
-}
-#endif //__cplusplus
-
-#endif // KALMAN_STATUS_REPORT__H_
