@@ -1,6 +1,6 @@
 project(ksrp)
 
-file(GLOB SRC "src/*.c")
+file(GLOB_RECURSE SRC "src/*.c")
 
 include_directories(include)
 add_library(ksrp ${SRC})
