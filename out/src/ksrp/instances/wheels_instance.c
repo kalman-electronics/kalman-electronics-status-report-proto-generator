@@ -83,7 +83,7 @@ KSRP_Status KSRP_UpdateFrameField_Wheels_Instance(
     switch(frame_id) {
         case KSRP_WHEELS_WHEELS_STATUS_FRAME_ID:
             switch(field_id) {
-                case KSRP_WHEELS_WHEELS_STATUS_DEVICE_ID_FIELD_ID:
+                case KSRP_WHEELS_WHEELS_STATUS_DEVICE_ID_FIELD_ID: {
                     if (value_size != sizeof(instance->wheels_status_instance.device_id)) {
                         return KSRP_STATUS_INVALID_DATA_SIZE;
                     }
@@ -103,7 +103,8 @@ KSRP_Status KSRP_UpdateFrameField_Wheels_Instance(
                             return KSRP_STATUS_ERROR;
 
                     break;
-                case KSRP_WHEELS_WHEELS_STATUS_DRIVER_STATUS_FIELD_ID:
+                }
+                case KSRP_WHEELS_WHEELS_STATUS_DRIVER_STATUS_FIELD_ID: {
                     if (value_size != sizeof(instance->wheels_status_instance.driver_status)) {
                         return KSRP_STATUS_INVALID_DATA_SIZE;
                     }
@@ -123,7 +124,8 @@ KSRP_Status KSRP_UpdateFrameField_Wheels_Instance(
                             return KSRP_STATUS_ERROR;
 
                     break;
-                case KSRP_WHEELS_WHEELS_STATUS_TEMPERATURE_FIELD_ID:
+                }
+                case KSRP_WHEELS_WHEELS_STATUS_TEMPERATURE_FIELD_ID: {
                     if (value_size != sizeof(instance->wheels_status_instance.temperature)) {
                         return KSRP_STATUS_INVALID_DATA_SIZE;
                     }
@@ -143,7 +145,8 @@ KSRP_Status KSRP_UpdateFrameField_Wheels_Instance(
                             return KSRP_STATUS_ERROR;
 
                     break;
-                case KSRP_WHEELS_WHEELS_STATUS_ALGORITHM_TYPE_FIELD_ID:
+                }
+                case KSRP_WHEELS_WHEELS_STATUS_ALGORITHM_TYPE_FIELD_ID: {
                     if (value_size != sizeof(instance->wheels_status_instance.algorithm_type)) {
                         return KSRP_STATUS_INVALID_DATA_SIZE;
                     }
@@ -163,7 +166,8 @@ KSRP_Status KSRP_UpdateFrameField_Wheels_Instance(
                             return KSRP_STATUS_ERROR;
 
                     break;
-                case KSRP_WHEELS_WHEELS_STATUS_ALGORITHM_TYPE2_FIELD_ID:
+                }
+                case KSRP_WHEELS_WHEELS_STATUS_ALGORITHM_TYPE2_FIELD_ID: {
                     if (value_size != sizeof(instance->wheels_status_instance.algorithm_type2)) {
                         return KSRP_STATUS_INVALID_DATA_SIZE;
                     }
@@ -183,7 +187,8 @@ KSRP_Status KSRP_UpdateFrameField_Wheels_Instance(
                             return KSRP_STATUS_ERROR;
 
                     break;
-                case KSRP_WHEELS_WHEELS_STATUS_TESTBOOL_FIELD_ID:
+                }
+                case KSRP_WHEELS_WHEELS_STATUS_TESTBOOL_FIELD_ID: {
                     if (value_size != sizeof(instance->wheels_status_instance.testbool)) {
                         return KSRP_STATUS_INVALID_DATA_SIZE;
                     }
@@ -203,6 +208,7 @@ KSRP_Status KSRP_UpdateFrameField_Wheels_Instance(
                             return KSRP_STATUS_ERROR;
 
                     break;
+                }
                 default:
                     return KSRP_STATUS_INVALID_FIELD_TYPE;
             }

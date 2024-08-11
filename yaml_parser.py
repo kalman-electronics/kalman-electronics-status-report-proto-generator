@@ -87,6 +87,7 @@ class Parser:
                 device_id_field.type = 'uint8_t'
                 device_id_field.name = 'device_id'
                 device_id_field.offset = current_offset
+                device_id_field.actual_size = ALLOWED_TYPES[device_id_field.type]
 
                 frame_obj.fields.append(device_id_field)
                 current_offset += 1

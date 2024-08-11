@@ -107,7 +107,7 @@ KSRP_Status KSRP_UpdateFrameField_Master_Instance(
     switch(frame_id) {
         case KSRP_MASTER_MASTER_STATUS_FRAME_ID:
             switch(field_id) {
-                case KSRP_MASTER_MASTER_STATUS_CAN_STATUS_FIELD_ID:
+                case KSRP_MASTER_MASTER_STATUS_CAN_STATUS_FIELD_ID: {
                     if (value_size != sizeof(instance->master_status_instance.can_status)) {
                         return KSRP_STATUS_INVALID_DATA_SIZE;
                     }
@@ -127,6 +127,7 @@ KSRP_Status KSRP_UpdateFrameField_Master_Instance(
                             return KSRP_STATUS_ERROR;
 
                     break;
+                }
                 default:
                     return KSRP_STATUS_INVALID_FIELD_TYPE;
             }
@@ -134,7 +135,7 @@ KSRP_Status KSRP_UpdateFrameField_Master_Instance(
             break;
         case KSRP_MASTER_DEVICES_ALIVE_FRAME_ID:
             switch(field_id) {
-                case KSRP_MASTER_DEVICES_ALIVE_WHEELS_FIELD_ID:
+                case KSRP_MASTER_DEVICES_ALIVE_WHEELS_FIELD_ID: {
                     if (value_size != sizeof(instance->devices_alive_instance.wheels)) {
                         return KSRP_STATUS_INVALID_DATA_SIZE;
                     }
@@ -154,6 +155,7 @@ KSRP_Status KSRP_UpdateFrameField_Master_Instance(
                             return KSRP_STATUS_ERROR;
 
                     break;
+                }
                 default:
                     return KSRP_STATUS_INVALID_FIELD_TYPE;
             }

@@ -48,8 +48,8 @@ _nonnull_
 KSRP_Status KSRP_Init_Wheels_WheelsStatus_Frame(KSRP_Wheels_WheelsStatus_Frame* frame) {
     memset(frame, 0, sizeof(KSRP_Wheels_WheelsStatus_Frame));
     frame->driver_status = 15;
-    frame->algorithm_type2 = (uint8_t) KSRP_WHEELS_WHEELS_STATUS_ALGORITHM_TYPE2;
-    frame->testbool = (uint8_t)true;
+    frame->algorithm_type2 = (KSRP_Wheels_WheelsStatus_AlgorithmType2_TypeDef) KSRP_WHEELS_WHEELS_STATUS_ALGORITHM_TYPE2_VELOCITY;
+    frame->testbool = (KSRP_Wheels_WheelsStatus_Testbool_TypeDef)true;
 
     return KSRP_STATUS_OK;
 }
@@ -71,12 +71,12 @@ KSRP_Status KSRP_Unpack_Wheels_WheelsStatus(const KSRP_RawData_Frame* raw_data, 
         return KSRP_STATUS_INVALID_FRAME_TYPE;
     }
     
-    frame->device_id = *((uint8_t*)&raw_data->data[0 + KSRP_ID_BYTES]);
+    frame->device_id = raw_data->data[0 + KSRP_ID_BYTES];
     frame->driver_status = raw_data->data[1 + KSRP_ID_BYTES];
     frame->temperature = *((float*)&raw_data->data[2 + KSRP_ID_BYTES]);
-    frame->algorithm_type = raw_data->data[6 + KSRP_ID_BYTES];
-    frame->algorithm_type2 = raw_data->data[7 + KSRP_ID_BYTES];
-    frame->testbool = raw_data->data[8 + KSRP_ID_BYTES];
+    frame->algorithm_type = (KSRP_Wheels_WheelsStatus_AlgorithmType_TypeDef)raw_data->data[6 + KSRP_ID_BYTES];
+    frame->algorithm_type2 = (KSRP_Wheels_WheelsStatus_AlgorithmType2_TypeDef)raw_data->data[7 + KSRP_ID_BYTES];
+    frame->testbool = (KSRP_Wheels_WheelsStatus_Testbool_TypeDef)raw_data->data[8 + KSRP_ID_BYTES];
 
     return KSRP_STATUS_OK;
 }
@@ -97,12 +97,12 @@ KSRP_Status KSRP_Pack_Wheels_WheelsStatus(const KSRP_Wheels_WheelsStatus_Frame* 
     raw_data->data[0] = KSRP_WHEELS_SUBSYSTEM_ID;
     raw_data->data[1] = KSRP_WHEELS_WHEELS_STATUS_FRAME_ID;
     
-    *((uint8_t*)&raw_data->data[0 + KSRP_ID_BYTES]) = frame->device_id;
+    raw_data->data[0 + KSRP_ID_BYTES] = frame->device_id;
     raw_data->data[1 + KSRP_ID_BYTES] = frame->driver_status;
     *((float*)&raw_data->data[2 + KSRP_ID_BYTES]) = frame->temperature;
-    raw_data->data[6 + KSRP_ID_BYTES] = frame->algorithm_type;
-    raw_data->data[7 + KSRP_ID_BYTES] = frame->algorithm_type2;
-    raw_data->data[8 + KSRP_ID_BYTES] = frame->testbool;
+    raw_data->data[6 + KSRP_ID_BYTES] = (uint8_t)frame->algorithm_type;
+    raw_data->data[7 + KSRP_ID_BYTES] = (uint8_t)frame->algorithm_type2;
+    raw_data->data[8 + KSRP_ID_BYTES] = (uint8_t)frame->testbool;
 
     raw_data->length = sizeof(KSRP_Wheels_WheelsStatus_Frame) + KSRP_ID_BYTES;
 

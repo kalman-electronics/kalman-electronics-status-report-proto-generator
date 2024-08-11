@@ -1,7 +1,9 @@
 /**
  * @file master_status_report.h
  * @brief Status report protocol definitions for master subsystem
- */#ifndef KALMAN_STATUS_REPORT_MASTER_H_
+ */
+
+#ifndef KALMAN_STATUS_REPORT_MASTER_H_
 #define KALMAN_STATUS_REPORT_MASTER_H_
 
 #ifdef __cplusplus
@@ -15,6 +17,7 @@ extern "C" {
 // Include user libraries
 #include "ksrp/frames.h"
 #include "ksrp/common.h"
+#include "ksrp/protocols/protocol_common.h"
 
 // Enum for all frame IDs in given subsystem
 // ASSUMPTION: Values won't exceed 1 byte (255)
@@ -366,4 +369,4 @@ const char* KSRP_HealthCheckDescription_Master_DevicesAlive_Wheels(const KSRP_Ma
 }
 #endif //__cplusplus
 
-#endif // KALMAN_STATUS_REPORT__H_
+#endif // KALMAN_STATUS_REPORT_MASTER_H_

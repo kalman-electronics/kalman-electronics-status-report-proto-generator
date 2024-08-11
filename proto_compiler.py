@@ -11,7 +11,7 @@ def generate_specific_files(protocols):
     SPECIFIC_FILES = [
         ('protocol_file_template.h.jinja2', 'include/ksrp/protocols/subsystems/{protocol_name}_protocol.h', {
             'clibraries': ["stdint.h", "stdbool.h"],
-            'libraries': ["ksrp/frames.h", "ksrp/common.h"],
+            'libraries': ["ksrp/frames.h", "ksrp/common.h", "ksrp/protocols/protocol_common.h"],
             'protocols': protocols.values()}),
         ('protocol_file_template.c.jinja2', 'src/ksrp/protocols/subsystems/{protocol_name}_protocol.c', {
             'libraries': ["ksrp/protocols/subsystems/{protocol_name}_protocol.h"],

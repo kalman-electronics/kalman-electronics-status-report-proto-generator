@@ -1,7 +1,9 @@
 /**
  * @file wheels_status_report.h
  * @brief Status report protocol definitions for wheels subsystem
- */#ifndef KALMAN_STATUS_REPORT_WHEELS_H_
+ */
+
+#ifndef KALMAN_STATUS_REPORT_WHEELS_H_
 #define KALMAN_STATUS_REPORT_WHEELS_H_
 
 #ifdef __cplusplus
@@ -15,6 +17,7 @@ extern "C" {
 // Include user libraries
 #include "ksrp/frames.h"
 #include "ksrp/common.h"
+#include "ksrp/protocols/protocol_common.h"
 
 // Enum for all frame IDs in given subsystem
 // ASSUMPTION: Values won't exceed 1 byte (255)
@@ -65,22 +68,31 @@ typedef enum {
 #define KSRP_WHEELS_WHEELS_STATUS_TEMPERATURE_HEALTH_CHECK_CRITICAL_3_DESCRIPTION "Temperature is very high"
 
 /**
- * @brief Enum value declarations for algorithm_type in WheelsStatus frame
+ * @brief Enum value declarations for algorithm_type in WheelsStatus frame, as enums are cast to uint8_t
+ * you should use KSRP_Wheels_WheelsStatus_AlgorithmType_TypeDef as type for that field
  */
 typedef enum {
     KSRP_WHEELS_WHEELS_STATUS_ALGORITHM_TYPE_POSITION,
     KSRP_WHEELS_WHEELS_STATUS_ALGORITHM_TYPE_VELOCITY,
     KSRP_WHEELS_WHEELS_STATUS_ALGORITHM_TYPE_TORQUE,
 } KSRP_Wheels_WheelsStatus_AlgorithmType;
+typedef uint8_t KSRP_Wheels_WheelsStatus_AlgorithmType_TypeDef;
 
 /**
- * @brief Enum value declarations for algorithm_type2 in WheelsStatus frame
+ * @brief Enum value declarations for algorithm_type2 in WheelsStatus frame, as enums are cast to uint8_t
+ * you should use KSRP_Wheels_WheelsStatus_AlgorithmType2_TypeDef as type for that field
  */
 typedef enum {
     KSRP_WHEELS_WHEELS_STATUS_ALGORITHM_TYPE2_POSITION = 1,
     KSRP_WHEELS_WHEELS_STATUS_ALGORITHM_TYPE2_VELOCITY = 2,
     KSRP_WHEELS_WHEELS_STATUS_ALGORITHM_TYPE2_TORQUE = 3,
 } KSRP_Wheels_WheelsStatus_AlgorithmType2;
+typedef uint8_t KSRP_Wheels_WheelsStatus_AlgorithmType2_TypeDef;
+
+/**
+ * @brief Type cast for testbool in WheelsStatus frame
+ */
+typedef uint8_t KSRP_Wheels_WheelsStatus_Testbool_TypeDef;
 
 /**
  * @brief WheelsStatus Frame definition
@@ -89,9 +101,9 @@ typedef struct _packed_ {
     uint8_t device_id;
     uint8_t driver_status;
     float temperature;
-    uint8_t algorithm_type;
-    uint8_t algorithm_type2;
-    uint8_t testbool;
+    KSRP_Wheels_WheelsStatus_AlgorithmType_TypeDef algorithm_type;
+    KSRP_Wheels_WheelsStatus_AlgorithmType2_TypeDef algorithm_type2;
+    KSRP_Wheels_WheelsStatus_Testbool_TypeDef testbool;
 } KSRP_Wheels_WheelsStatus_Frame;
 
 /// @brief Type ID for WheelsStatus frame
@@ -353,4 +365,4 @@ const char* KSRP_HealthCheckDescription_Wheels_WheelsStatus_Temperature(const KS
 }
 #endif //__cplusplus
 
-#endif // KALMAN_STATUS_REPORT__H_
+#endif // KALMAN_STATUS_REPORT_WHEELS_H_

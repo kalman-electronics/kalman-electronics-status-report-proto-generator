@@ -99,7 +99,7 @@ KSRP_Status KSRP_UpdateFrameField_{{ snake_to_camel(protocol.subsystem) }}_Insta
         case KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_FRAME_ID:
             switch(field_id) {
     {%- for field in frame.fields %}
-                case KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_{{ field.name | upper }}_FIELD_ID:
+                case KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_{{ field.name | upper }}_FIELD_ID: {
                     if (value_size != sizeof(instance->{{ frame.name }}_instance.{{ field.name }})) {
                         return KSRP_STATUS_INVALID_DATA_SIZE;
                     }
@@ -119,6 +119,7 @@ KSRP_Status KSRP_UpdateFrameField_{{ snake_to_camel(protocol.subsystem) }}_Insta
                             return KSRP_STATUS_ERROR;
 
                     break;
+                }
     {%- endfor %}
                 default:
                     return KSRP_STATUS_INVALID_FIELD_TYPE;

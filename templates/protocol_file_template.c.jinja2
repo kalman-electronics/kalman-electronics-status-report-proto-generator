@@ -65,9 +65,9 @@ KSRP_Status KSRP_Init_{{ frame_unique_id }}_Frame({{ frame_type }}* frame) {
     {%- for field in frame.fields %}
         {%- if field.default != none  %}
             {%- if field.is_enum %}
-    frame->{{ field.name }} = ({{ field.cast_type }}) KSRP_{{ define_unique_id }}_{{ field.name | upper}};
+    frame->{{ field.name }} = ({{ field.type }}_TypeDef) KSRP_{{ define_unique_id }}_{{ field.name | upper}}_{{ field.default }};
             {%- elif field.is_type_cast %}
-    frame->{{ field.name }} = ({{ field.cast_type }}){{ field.default }};
+    frame->{{ field.name }} = (KSRP_{{ frame_unique_id }}_{{ snake_to_camel(field.name) }}_TypeDef){{ field.default }};
             {%- else %}
     frame->{{ field.name }} = {{ field.default }};
             {%- endif  %}
@@ -95,13 +95,17 @@ KSRP_Status KSRP_Unpack_{{ frame_unique_id }}(const KSRP_RawData_Frame* raw_data
     }
     {% for field in frame.fields %}
         {%- if field.actual_size == 1 %}
-            {%- if (field.is_type_cast and field.cast_type != 'uint8_t') or (not field.is_type_cast and field.type != 'uint8_t' ) %}
+            {%- if field.is_enum %}
+    frame->{{ field.name }} = ({{ field.type }}_TypeDef)raw_data->data[{{ field.offset }} + KSRP_ID_BYTES];
+            {%- elif field.is_type_cast %}
+    frame->{{ field.name }} = (KSRP_{{ frame_unique_id }}_{{ snake_to_camel(field.name) }}_TypeDef)raw_data->data[{{ field.offset }} + KSRP_ID_BYTES];
+            {%- elif field.type != 'uint8_t'  %}
     frame->{{ field.name }} = ({{ field.type }})raw_data->data[{{ field.offset }} + KSRP_ID_BYTES];
             {%- else %}
     frame->{{ field.name }} = raw_data->data[{{ field.offset }} + KSRP_ID_BYTES];
             {%- endif %}
         {%- elif field.is_type_cast %}
-    frame->{{ field.name }} = *(({{ field.cast_type }}*)&raw_data->data[{{ field.offset }} + KSRP_ID_BYTES]);
+    frame->{{ field.name }} = *((KSRP_{{ frame_unique_id }}_{{ snake_to_camel(field.name) }}_TypeDef*)&raw_data->data[{{ field.offset }} + KSRP_ID_BYTES]);
         {%- else %}
     frame->{{ field.name }} = *(({{ field.type }}*)&raw_data->data[{{ field.offset }} + KSRP_ID_BYTES]);
         {%- endif  %}
@@ -127,13 +131,17 @@ KSRP_Status KSRP_Pack_{{ frame_unique_id }}(const {{ frame_type }}* frame, KSRP_
     raw_data->data[1] = KSRP_{{ define_unique_id }}_FRAME_ID;
     {% for field in frame.fields %}
         {%- if field.actual_size == 1 %}
-            {%- if (field.is_type_cast and field.cast_type != 'uint8_t') or (not field.is_type_cast and field.type != 'uint8_t' ) %}
+            {%- if field.is_enum %}
+    raw_data->data[{{ field.offset }} + KSRP_ID_BYTES] = (uint8_t)frame->{{ field.name }};
+            {%- elif field.is_type_cast %}
+    raw_data->data[{{ field.offset }} + KSRP_ID_BYTES] = (uint8_t)frame->{{ field.name }};
+            {%- elif field.type != 'uint8_t'  %}
     raw_data->data[{{ field.offset }} + KSRP_ID_BYTES] = (uint8_t)frame->{{ field.name }};
             {%- else %}
     raw_data->data[{{ field.offset }} + KSRP_ID_BYTES] = frame->{{ field.name }};
             {%- endif %}
         {%- elif field.is_type_cast %}
-    *(({{ field.cast_type }}*)&raw_data->data[{{ field.offset }} + KSRP_ID_BYTES]) = frame->{{ field.name }};
+    *((KSRP_{{ frame_unique_id }}_{{ snake_to_camel(field.name) }}_TypeDef*)&raw_data->data[{{ field.offset }} + KSRP_ID_BYTES]) = frame->{{ field.name }};
         {%- else %}
     *(({{ field.type }}*)&raw_data->data[{{ field.offset }} + KSRP_ID_BYTES]) = frame->{{ field.name }};
         {%- endif  %}

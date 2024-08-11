@@ -1,10 +1,11 @@
+{%- macro snake_to_camel(snake_case_str) -%}
+    {{ snake_case_str |  replace('_', ' ') | title | replace('_', '') | replace(' ', '') }}
+{%- endmacro -%}
 /**
  * @file {{ protocol.subsystem }}_status_report.h
  * @brief Status report protocol definitions for {{ protocol.subsystem }} subsystem
  */
-{%- macro snake_to_camel(snake_case_str) -%}
-{{ snake_case_str |  replace('_', ' ') | title | replace('_', '') | replace(' ', '') }}
-{%- endmacro -%}
+
 #ifndef KALMAN_STATUS_REPORT_{{ protocol.subsystem | upper }}_H_
 #define KALMAN_STATUS_REPORT_{{ protocol.subsystem | upper }}_H_
 
@@ -76,10 +77,10 @@ typedef enum {
         {%-endif %}
     {%- endfor %}
 {%- endfor %}
-{% for field in frame.fields %}
-{%- if field.is_enum %}
+{% for field in frame.fields if field.is_enum %}
 /**
- * @brief Enum value declarations for {{ field.name }} in {{ snake_to_camel(frame.name) }} frame
+ * @brief Enum value declarations for {{ field.name }} in {{ snake_to_camel(frame.name) }} frame, as enums are cast to uint8_t
+ * you should use {{ field.type }}_TypeDef as type for that field
  */
 typedef enum {
     {%-for value in field.values %}
@@ -90,18 +91,24 @@ typedef enum {
         {%-endif %}
     {%-endfor %}
 } {{ field.type }};
-{%endif %}
-
-{%- endfor %}
-
+typedef uint8_t {{ field.type }}_TypeDef;
+{% endfor %}
+{%- for field in frame.fields if field.is_type_cast and not field.is_enum %}
+/**
+ * @brief Type cast for {{ field.name }} in {{ snake_to_camel(frame.name) }} frame
+ */
+typedef {{ field.cast_type }} KSRP_{{ frame_unique_id }}_{{ snake_to_camel(field.name) }}_TypeDef;
+{% endfor  %}
 {%- set frame_type = 'KSRP_' ~ frame_unique_id~ '_Frame' %}
 /**
  * @brief {{ snake_to_camel(frame.name) }} Frame definition
  */
 typedef struct _packed_ {
     {%- for field in frame.fields %}
-        {%- if field.is_type_cast  %}
-    {{ field.cast_type }} {{ field.name }};
+        {%- if field.is_enum  %}
+    {{ field.type }}_TypeDef {{ field.name }};
+        {%- elif field.is_type_cast %}
+    KSRP_{{ frame_unique_id }}_{{ snake_to_camel(field.name) }}_TypeDef {{ field.name }};
         {%- else %}
     {{ field.type }} {{ field.name }};
         {%- endif %}
@@ -256,4 +263,4 @@ const char* KSRP_HealthCheckDescription_{{ frame_unique_id }}_{{ snake_to_camel(
 }
 #endif //__cplusplus
 
-#endif // KALMAN_STATUS_REPORT_{{ protocol.subsytem | upper }}_H_
+#endif // KALMAN_STATUS_REPORT_{{ protocol.subsystem | upper }}_H_
