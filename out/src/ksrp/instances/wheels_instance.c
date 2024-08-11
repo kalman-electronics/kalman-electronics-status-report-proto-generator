@@ -59,7 +59,8 @@ KSRP_Status KSRP_UpdateFrame_Wheels_Instance(
                 if (change) {
                     KSRP_RawData_Frame raw_frame;
                     KSRP_RawDataFrame_Init(&raw_frame);
-                    if (KSRP_Pack_Wheels_WheelsStatus != KSRP_STATUS_OK)
+                    if (KSRP_Pack_Wheels_WheelsStatus(
+                            &instance->wheels_status_instance, &raw_frame) != KSRP_STATUS_OK)
                         return KSRP_STATUS_ERROR;
                     if (instance->send_frame_callback(&raw_frame) != KSRP_STATUS_OK)
                         return KSRP_STATUS_ERROR;
@@ -116,11 +117,12 @@ KSRP_Status KSRP_UpdateFrameField_Wheels_Instance(
                         if (change) {
                             KSRP_RawData_Frame raw_frame;
                             KSRP_RawDataFrame_Init(&raw_frame);
-                            if (KSRP_Pack_Wheels_WheelsStatus != KSRP_STATUS_OK)
+                            if (KSRP_Pack_Wheels_WheelsStatus(
+                                    &instance->wheels_status_instance, &raw_frame) != KSRP_STATUS_OK)
                                 return KSRP_STATUS_ERROR;
                             if (instance->send_frame_callback(&raw_frame) != KSRP_STATUS_OK)
                                 return KSRP_STATUS_ERROR;
-                    }
+                        }
 
                     break;
                 }
@@ -147,11 +149,12 @@ KSRP_Status KSRP_UpdateFrameField_Wheels_Instance(
                         if (change) {
                             KSRP_RawData_Frame raw_frame;
                             KSRP_RawDataFrame_Init(&raw_frame);
-                            if (KSRP_Pack_Wheels_WheelsStatus != KSRP_STATUS_OK)
+                            if (KSRP_Pack_Wheels_WheelsStatus(
+                                    &instance->wheels_status_instance, &raw_frame) != KSRP_STATUS_OK)
                                 return KSRP_STATUS_ERROR;
                             if (instance->send_frame_callback(&raw_frame) != KSRP_STATUS_OK)
                                 return KSRP_STATUS_ERROR;
-                    }
+                        }
 
                     break;
                 }
@@ -178,11 +181,12 @@ KSRP_Status KSRP_UpdateFrameField_Wheels_Instance(
                         if (change) {
                             KSRP_RawData_Frame raw_frame;
                             KSRP_RawDataFrame_Init(&raw_frame);
-                            if (KSRP_Pack_Wheels_WheelsStatus != KSRP_STATUS_OK)
+                            if (KSRP_Pack_Wheels_WheelsStatus(
+                                    &instance->wheels_status_instance, &raw_frame) != KSRP_STATUS_OK)
                                 return KSRP_STATUS_ERROR;
                             if (instance->send_frame_callback(&raw_frame) != KSRP_STATUS_OK)
                                 return KSRP_STATUS_ERROR;
-                    }
+                        }
 
                     break;
                 }
@@ -209,11 +213,12 @@ KSRP_Status KSRP_UpdateFrameField_Wheels_Instance(
                         if (change) {
                             KSRP_RawData_Frame raw_frame;
                             KSRP_RawDataFrame_Init(&raw_frame);
-                            if (KSRP_Pack_Wheels_WheelsStatus != KSRP_STATUS_OK)
+                            if (KSRP_Pack_Wheels_WheelsStatus(
+                                    &instance->wheels_status_instance, &raw_frame) != KSRP_STATUS_OK)
                                 return KSRP_STATUS_ERROR;
                             if (instance->send_frame_callback(&raw_frame) != KSRP_STATUS_OK)
                                 return KSRP_STATUS_ERROR;
-                    }
+                        }
 
                     break;
                 }
@@ -240,11 +245,12 @@ KSRP_Status KSRP_UpdateFrameField_Wheels_Instance(
                         if (change) {
                             KSRP_RawData_Frame raw_frame;
                             KSRP_RawDataFrame_Init(&raw_frame);
-                            if (KSRP_Pack_Wheels_WheelsStatus != KSRP_STATUS_OK)
+                            if (KSRP_Pack_Wheels_WheelsStatus(
+                                    &instance->wheels_status_instance, &raw_frame) != KSRP_STATUS_OK)
                                 return KSRP_STATUS_ERROR;
                             if (instance->send_frame_callback(&raw_frame) != KSRP_STATUS_OK)
                                 return KSRP_STATUS_ERROR;
-                    }
+                        }
 
                     break;
                 }
@@ -271,11 +277,12 @@ KSRP_Status KSRP_UpdateFrameField_Wheels_Instance(
                         if (change) {
                             KSRP_RawData_Frame raw_frame;
                             KSRP_RawDataFrame_Init(&raw_frame);
-                            if (KSRP_Pack_Wheels_WheelsStatus != KSRP_STATUS_OK)
+                            if (KSRP_Pack_Wheels_WheelsStatus(
+                                    &instance->wheels_status_instance, &raw_frame) != KSRP_STATUS_OK)
                                 return KSRP_STATUS_ERROR;
                             if (instance->send_frame_callback(&raw_frame) != KSRP_STATUS_OK)
                                 return KSRP_STATUS_ERROR;
-                    }
+                        }
 
                     break;
                 }

@@ -62,7 +62,8 @@ KSRP_Status KSRP_UpdateFrame_Master_Instance(
                 if (change) {
                     KSRP_RawData_Frame raw_frame;
                     KSRP_RawDataFrame_Init(&raw_frame);
-                    if (KSRP_Pack_Master_MasterStatus != KSRP_STATUS_OK)
+                    if (KSRP_Pack_Master_MasterStatus(
+                            &instance->master_status_instance, &raw_frame) != KSRP_STATUS_OK)
                         return KSRP_STATUS_ERROR;
                     if (instance->send_frame_callback(&raw_frame) != KSRP_STATUS_OK)
                         return KSRP_STATUS_ERROR;
@@ -93,7 +94,8 @@ KSRP_Status KSRP_UpdateFrame_Master_Instance(
                 if (change) {
                     KSRP_RawData_Frame raw_frame;
                     KSRP_RawDataFrame_Init(&raw_frame);
-                    if (KSRP_Pack_Master_DevicesAlive != KSRP_STATUS_OK)
+                    if (KSRP_Pack_Master_DevicesAlive(
+                            &instance->devices_alive_instance, &raw_frame) != KSRP_STATUS_OK)
                         return KSRP_STATUS_ERROR;
                     if (instance->send_frame_callback(&raw_frame) != KSRP_STATUS_OK)
                         return KSRP_STATUS_ERROR;
@@ -150,11 +152,12 @@ KSRP_Status KSRP_UpdateFrameField_Master_Instance(
                         if (change) {
                             KSRP_RawData_Frame raw_frame;
                             KSRP_RawDataFrame_Init(&raw_frame);
-                            if (KSRP_Pack_Master_MasterStatus != KSRP_STATUS_OK)
+                            if (KSRP_Pack_Master_MasterStatus(
+                                    &instance->master_status_instance, &raw_frame) != KSRP_STATUS_OK)
                                 return KSRP_STATUS_ERROR;
                             if (instance->send_frame_callback(&raw_frame) != KSRP_STATUS_OK)
                                 return KSRP_STATUS_ERROR;
-                    }
+                        }
 
                     break;
                 }
@@ -188,11 +191,12 @@ KSRP_Status KSRP_UpdateFrameField_Master_Instance(
                         if (change) {
                             KSRP_RawData_Frame raw_frame;
                             KSRP_RawDataFrame_Init(&raw_frame);
-                            if (KSRP_Pack_Master_DevicesAlive != KSRP_STATUS_OK)
+                            if (KSRP_Pack_Master_DevicesAlive(
+                                    &instance->devices_alive_instance, &raw_frame) != KSRP_STATUS_OK)
                                 return KSRP_STATUS_ERROR;
                             if (instance->send_frame_callback(&raw_frame) != KSRP_STATUS_OK)
                                 return KSRP_STATUS_ERROR;
-                    }
+                        }
 
                     break;
                 }
