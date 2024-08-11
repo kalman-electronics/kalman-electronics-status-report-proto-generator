@@ -146,22 +146,21 @@ KSRP_Status KSRP_UpdateFrameField_Master_Instance(
                                 KSRP_MASTER_MASTER_STATUS_CAN_STATUS_FIELD_ID) != KSRP_STATUS_OK)
                             return KSRP_STATUS_ERROR;
 
+                    if (instance->send_frame_callback != NULL)
+                        if (change) {
+                            KSRP_RawData_Frame raw_frame;
+                            KSRP_RawDataFrame_Init(&raw_frame);
+                            if (KSRP_Pack_Master_MasterStatus != KSRP_STATUS_OK)
+                                return KSRP_STATUS_ERROR;
+                            if (instance->send_frame_callback(&raw_frame) != KSRP_STATUS_OK)
+                                return KSRP_STATUS_ERROR;
+                    }
+
                     break;
                 }
                 default:
                     return KSRP_STATUS_INVALID_FIELD_TYPE;
             }
-
-            if (instance->send_frame_callback != NULL)
-                if (change) {
-                    KSRP_RawData_Frame raw_frame;
-                    KSRP_RawDataFrame_Init(&raw_frame);
-                    if (KSRP_Pack_Master_MasterStatus != KSRP_STATUS_OK)
-                        return KSRP_STATUS_ERROR;
-                    if (instance->send_frame_callback(&raw_frame) != KSRP_STATUS_OK)
-                        return KSRP_STATUS_ERROR;
-                }
-
             break;
         }
         case KSRP_MASTER_DEVICES_ALIVE_FRAME_ID: {
@@ -185,22 +184,21 @@ KSRP_Status KSRP_UpdateFrameField_Master_Instance(
                                 KSRP_MASTER_DEVICES_ALIVE_WHEELS_FIELD_ID) != KSRP_STATUS_OK)
                             return KSRP_STATUS_ERROR;
 
+                    if (instance->send_frame_callback != NULL)
+                        if (change) {
+                            KSRP_RawData_Frame raw_frame;
+                            KSRP_RawDataFrame_Init(&raw_frame);
+                            if (KSRP_Pack_Master_DevicesAlive != KSRP_STATUS_OK)
+                                return KSRP_STATUS_ERROR;
+                            if (instance->send_frame_callback(&raw_frame) != KSRP_STATUS_OK)
+                                return KSRP_STATUS_ERROR;
+                    }
+
                     break;
                 }
                 default:
                     return KSRP_STATUS_INVALID_FIELD_TYPE;
             }
-
-            if (instance->send_frame_callback != NULL)
-                if (change) {
-                    KSRP_RawData_Frame raw_frame;
-                    KSRP_RawDataFrame_Init(&raw_frame);
-                    if (KSRP_Pack_Master_DevicesAlive != KSRP_STATUS_OK)
-                        return KSRP_STATUS_ERROR;
-                    if (instance->send_frame_callback(&raw_frame) != KSRP_STATUS_OK)
-                        return KSRP_STATUS_ERROR;
-                }
-
             break;
         }
         default:

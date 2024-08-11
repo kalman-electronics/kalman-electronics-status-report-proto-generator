@@ -8,6 +8,7 @@ extern "C" {
 #include <stdint.h>
 
 #define KSRP_ID_BYTES 2
+#define KSRP_MAX_FRAME_SIZE 64 - KSRP_ID_BYTES
 
 #define _packed_ __attribute__((packed))
 #define _nonnull_ __attribute__((nonnull))

@@ -82,7 +82,7 @@ KSRP_Status KSRP_Unpack_Master_MasterStatus(const KSRP_RawData_Frame* raw_data, 
  */
 _nonnull_
 KSRP_Status KSRP_Pack_Master_MasterStatus(const KSRP_Master_MasterStatus_Frame* frame, KSRP_RawData_Frame* raw_data) {
-    if (MAX_FRAME_SIZE < sizeof(KSRP_Master_MasterStatus_Frame)) {
+    if (KSRP_MAX_FRAME_SIZE < sizeof(KSRP_Master_MasterStatus_Frame)) {
         return KSRP_STATUS_INVALID_DATA_SIZE;
     }
 
@@ -285,7 +285,7 @@ KSRP_Status KSRP_Unpack_Master_DevicesAlive(const KSRP_RawData_Frame* raw_data, 
  */
 _nonnull_
 KSRP_Status KSRP_Pack_Master_DevicesAlive(const KSRP_Master_DevicesAlive_Frame* frame, KSRP_RawData_Frame* raw_data) {
-    if (MAX_FRAME_SIZE < sizeof(KSRP_Master_DevicesAlive_Frame)) {
+    if (KSRP_MAX_FRAME_SIZE < sizeof(KSRP_Master_DevicesAlive_Frame)) {
         return KSRP_STATUS_INVALID_DATA_SIZE;
     }
 
