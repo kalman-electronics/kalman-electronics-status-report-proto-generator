@@ -340,6 +340,23 @@ uint32_t KSRP_Wheels_Instance_GetTimeSinceLastUpdate(
  * @return KSRP_Status The status of the operation, KSRP_STATUS_OK if successful
  */
 _nonnull_
+KSRP_Status KSRP_Wheels_Instance_SetSendFrameCallback(
+    KSRP_Wheels_Instance* instance,
+    KSRP_Status (*send_frame_callback)(KSRP_RawData_Frame* frame)) {
+    instance->send_frame_callback = send_frame_callback;
+
+    return KSRP_STATUS_OK;
+}
+
+/**
+ * @brief Set the callback for a frame in the instance, callback is called when frame value is changed
+ *
+ * @param instance The instance to set the callback for
+ * @param frame_id The ID of the frame to set the callback for
+ * @param callback The callback function to set
+ * @return KSRP_Status The status of the operation, KSRP_STATUS_OK if successful
+ */
+_nonnull_
 KSRP_Status KSRP_Wheels_Instance_SetCallback(
     KSRP_Wheels_Instance* instance,
     KSRP_Wheels_FrameID frame_id,

@@ -107,6 +107,19 @@ uint32_t KSRP_Master_Instance_GetTimeSinceLastUpdate(
  * @return KSRP_Status The status of the operation, KSRP_STATUS_OK if successful
  */
 _nonnull_
+KSRP_Status KSRP_Master_Instance_SetSendFrameCallback(
+    KSRP_Master_Instance* instance,
+    KSRP_Status (*send_frame_callback)(KSRP_RawData_Frame* frame));
+
+/**
+ * @brief Set the callback for a frame in the instance, callback is called when frame value is changed
+ *
+ * @param instance The instance to set the callback for
+ * @param frame_id The ID of the frame to set the callback for
+ * @param callback The callback function to set
+ * @return KSRP_Status The status of the operation, KSRP_STATUS_OK if successful
+ */
+_nonnull_
 KSRP_Status KSRP_Master_Instance_SetCallback(
     KSRP_Master_Instance* instance,
     KSRP_Master_FrameID frame_id,
