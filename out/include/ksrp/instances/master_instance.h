@@ -30,6 +30,8 @@ typedef struct {
     
     KSRP_FrameUpdateCallback master_status_callback;
     KSRP_FrameUpdateCallback devices_alive_callback;
+
+    KSRP_Status (*send_frame_callback)(KSRP_RawData_Frame* frame);
 } KSRP_Master_Instance;
 
 /**

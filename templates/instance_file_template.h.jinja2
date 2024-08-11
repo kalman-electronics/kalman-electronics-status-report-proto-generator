@@ -36,6 +36,8 @@ typedef struct {
     {% for frame in protocol.frames %}
     KSRP_FrameUpdateCallback {{ frame.name }}_callback;
     {%- endfor  %}
+
+    KSRP_Status (*send_frame_callback)(KSRP_RawData_Frame* frame);
 } KSRP_{{ snake_to_camel(protocol.subsystem) }}_Instance;
 
 /**

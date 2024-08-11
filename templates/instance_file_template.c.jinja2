@@ -68,6 +68,16 @@ KSRP_Status KSRP_UpdateFrame_{{ snake_to_camel(protocol.subsystem) }}_Instance(
                         KSRP_ILLEGAL_FIELD_ID) != KSRP_STATUS_OK)
                     return KSRP_STATUS_ERROR;
 
+            if (instance->send_frame_callback != NULL)
+                if (change) {
+                    KSRP_RawData_Frame raw_frame;
+                    KSRP_RawDataFrame_Init(&raw_frame);
+                    if (KSRP_Pack_{{ snake_to_camel(protocol.subsystem) }}_{{ snake_to_camel(frame.name) }} != KSRP_STATUS_OK)
+                        return KSRP_STATUS_ERROR;
+                    if (instance->send_frame_callback(&raw_frame) != KSRP_STATUS_OK)
+                        return KSRP_STATUS_ERROR;
+                }
+
             break;
         }
 {%- endfor %}
@@ -96,7 +106,7 @@ KSRP_Status KSRP_UpdateFrameField_{{ snake_to_camel(protocol.subsystem) }}_Insta
 
     switch(frame_id) {
 {%- for frame in protocol.frames %}
-        case KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_FRAME_ID:
+        case KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_FRAME_ID: {
             switch(field_id) {
     {%- for field in frame.fields %}
                 case KSRP_{{ protocol.subsystem | upper }}_{{ frame.name | upper }}_{{ field.name | upper }}_FIELD_ID: {
@@ -125,10 +135,18 @@ KSRP_Status KSRP_UpdateFrameField_{{ snake_to_camel(protocol.subsystem) }}_Insta
                     return KSRP_STATUS_INVALID_FIELD_TYPE;
             }
 
-            break;
-    {%- for field in frame.fields %}
+            if (instance->send_frame_callback != NULL)
+                if (change) {
+                    KSRP_RawData_Frame raw_frame;
+                    KSRP_RawDataFrame_Init(&raw_frame);
+                    if (KSRP_Pack_{{ snake_to_camel(protocol.subsystem) }}_{{ snake_to_camel(frame.name) }} != KSRP_STATUS_OK)
+                        return KSRP_STATUS_ERROR;
+                    if (instance->send_frame_callback(&raw_frame) != KSRP_STATUS_OK)
+                        return KSRP_STATUS_ERROR;
+                }
 
-    {%- endfor %}
+            break;
+        }
 {%- endfor %}
         default:
             return KSRP_STATUS_INVALID_FRAME_TYPE;

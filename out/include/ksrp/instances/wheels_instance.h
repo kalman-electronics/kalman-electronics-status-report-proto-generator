@@ -27,6 +27,8 @@ typedef struct {
     uint32_t wheels_status_ms_since_last_update;
     
     KSRP_FrameUpdateCallback wheels_status_callback;
+
+    KSRP_Status (*send_frame_callback)(KSRP_RawData_Frame* frame);
 } KSRP_Wheels_Instance;
 
 /**

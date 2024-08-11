@@ -90,7 +90,7 @@ KSRP_Status KSRP_Unpack_Wheels_WheelsStatus(const KSRP_RawData_Frame* raw_data, 
  */
 _nonnull_
 KSRP_Status KSRP_Pack_Wheels_WheelsStatus(const KSRP_Wheels_WheelsStatus_Frame* frame, KSRP_RawData_Frame* raw_data) {
-    if (raw_data->capacity < sizeof(KSRP_Wheels_WheelsStatus_Frame) + KSRP_ID_BYTES) {
+    if (MAX_FRAME_SIZE < sizeof(KSRP_Wheels_WheelsStatus_Frame)) {
         return KSRP_STATUS_INVALID_DATA_SIZE;
     }
 

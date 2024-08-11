@@ -123,7 +123,7 @@ KSRP_Status KSRP_Unpack_{{ frame_unique_id }}(const KSRP_RawData_Frame* raw_data
  */
 _nonnull_
 KSRP_Status KSRP_Pack_{{ frame_unique_id }}(const {{ frame_type }}* frame, KSRP_RawData_Frame* raw_data) {
-    if (raw_data->capacity < sizeof({{ frame_type }}) + KSRP_ID_BYTES) {
+    if (MAX_FRAME_SIZE < sizeof({{ frame_type }})) {
         return KSRP_STATUS_INVALID_DATA_SIZE;
     }
 
