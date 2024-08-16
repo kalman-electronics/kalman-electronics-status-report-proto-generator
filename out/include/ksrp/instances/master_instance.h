@@ -17,7 +17,6 @@ extern "C" {
 #include "ksrp/common.h"
 #include "ksrp/protocols/subsystems/master_protocol.h"
 
-//TODO: Automatic frame sending
 /**
  * @brief Instance structure for the master subsystem
  */
@@ -110,6 +109,16 @@ _nonnull_
 KSRP_Status KSRP_Master_Instance_SetSendFrameCallback(
     KSRP_Master_Instance* instance,
     KSRP_Status (*send_frame_callback)(KSRP_RawData_Frame* frame));
+
+/**
+* @brief Send a ping frame from the instance
+ *
+ * @param instance The instance to send the ping from
+ * @return KSRP_Status The status of the operation, KSRP_STATUS_OK if successful
+ */
+_nonnull_
+KSRP_Statu KSRP_Master_Instance_SendPing(
+    KSRP_Master_Instance* instance);
 
 /**
  * @brief Set the callback for a frame in the instance, callback is called when frame value is changed

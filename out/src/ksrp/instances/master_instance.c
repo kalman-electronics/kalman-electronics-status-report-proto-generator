@@ -245,7 +245,24 @@ uint32_t KSRP_Master_Instance_GetTimeSinceLastUpdate(
             return instance->devices_alive_ms_since_last_update;
         default:
             return 0xFFFFFFFF;
+    }
 }
+
+/**
+ * @brief Send a ping frame from the instance
+ *
+ * @param instance The instance to send the ping from
+ * @return KSRP_Status The status of the operation, KSRP_STATUS_OK if successful
+ */
+KSRP_Statu KSRP_Master_Instance_SendPing(
+    KSRP_Master_Instance* instance) {
+
+    KSRP_RawData_Frame ping_frame;
+    KSRP_RawDataFrame_Init(&ping_frame);
+    KSRP_RawDataFrame_Append(&ping_frame, (uint8_t[]){
+    KSRP_MASTER_SUBSYSTEM_ID}, 1);
+
+    return instance->send_frame_callback(&ping_frame);
 }
 
 /**

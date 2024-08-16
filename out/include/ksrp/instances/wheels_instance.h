@@ -17,7 +17,6 @@ extern "C" {
 #include "ksrp/common.h"
 #include "ksrp/protocols/subsystems/wheels_protocol.h"
 
-//TODO: Automatic frame sending
 /**
  * @brief Instance structure for the wheels subsystem
  */
@@ -107,6 +106,16 @@ _nonnull_
 KSRP_Status KSRP_Wheels_Instance_SetSendFrameCallback(
     KSRP_Wheels_Instance* instance,
     KSRP_Status (*send_frame_callback)(KSRP_RawData_Frame* frame));
+
+/**
+* @brief Send a ping frame from the instance
+ *
+ * @param instance The instance to send the ping from
+ * @return KSRP_Status The status of the operation, KSRP_STATUS_OK if successful
+ */
+_nonnull_
+KSRP_Statu KSRP_Wheels_Instance_SendPing(
+    KSRP_Wheels_Instance* instance);
 
 /**
  * @brief Set the callback for a frame in the instance, callback is called when frame value is changed
