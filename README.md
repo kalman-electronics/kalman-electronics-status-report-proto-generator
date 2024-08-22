@@ -33,17 +33,21 @@ protocol:
 
   frames: <array> | required
     - name: <str> | required
-      type: <type> | required
-      default: <str> | optional
-      values: [<str>, ..., <str> : <int>] <array> | required if type = enum
-      health_checks: <array> | optional
-        - type: {range | exact} | required
-          min: <int | float> | required if type = range
-          max: <int | float> | required if type = range
-          value: <int | float> | required if type = exact
-          result: {OK | WARNING | CRITICAL} | required
-          description: <str> | optional
-          troubleshoot: <str> | optional
+      frame_id: <int> | required
+      fields: <array> | required
+        - name: <str> | required
+          type: <type> | required
+          default: <str> | optional
+          values: [<str>, ..., <str> : <int>] <array> | required if type = enum
+          health_checks: <array> | optional
+            - type: {range | exact} | required
+              min: <int | float> | required if type = range
+              max: <int | float> | required if type = range
+              value: <int | float> | required if type = exact
+              result: {OK | WARNING | CRITICAL} | required
+              description: <str> | optional
+              troubleshoot: <str> | optional
+            - ...
         - ...
     - ...
 ```
@@ -52,4 +56,30 @@ protocol:
 - `subsystem` - unique name of the subsystem, should be in snake_case convention. This name will be used as prefix of generated C code refering this submodule
 - `multiple_devices` - boolean field used defining devices that are used with multiple instances at the time (i.e motor and arm controllers). If set to `true` there will be addituonal id field added to frame payload for instances distinction
 - `frames` - list of frame objects, defining different kinds of status frames that might be sent from the device. Different frames should be grouping status information within common topic. (i.e Can status frame should gather informations about tcan, last can errors, can bus status, etc.)
-- `frame.name`
+  - `frame.name` - name of the frame that is part of status of the subsysystem
+  - `frame.frame_id` - id number that must be unique without subsystem the frame refers to
+  - `frame.fields` - array of the fields that frame consists of
+    - `field.name` - name of the field
+    - `field.type` - type of the field inside of structure, one of allowed types (see below)
+    - `field.values` - list of possible enum values, you can either use raw list \[A, B, C\] or list of mappings \[A: 1, B: 2, C:3\] to change number represented by enum label
+    - `field.default` - default value of the field at the struct init, should be passed at string (for enums you can write one of the enum values)
+    - `fields.health_checks` - optional list of value validation, that can describe current condition of the component
+      - `health_check.type` - type of the validation, either `exact` where value is matched with equals sign or `range` where value is checked whether it fits in given range
+
+#### Allowed field types
+|------------|------------|
+|   type     |    size    |
+|------------|------------|
+|  uint8_t   |      1     |
+|  uint16_t  |      2     |
+|  uint32_t  |      4     |
+|  uint64_t  |      8     | 
+|  int8_t    |      1     |
+|  int16_t   |      2     |
+|  int32_t   |      4     |
+|  int64_t   |      8     |
+|  float     |      4     |
+|  double    |      8     |
+|  enum      | 1 (unit8_t)| 
+|  bool      | 1 (uint8_t)|
+|------------|------------|  
