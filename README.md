@@ -65,9 +65,14 @@ protocol:
     - `field.default` - default value of the field at the struct init, should be passed at string (for enums you can write one of the enum values)
     - `fields.health_checks` - optional list of value validation, that can describe current condition of the component
       - `health_check.type` - type of the validation, either `exact` where value is matched with equals sign or `range` where value is checked whether it fits in given range
+      - `health_check.result` - classification label for the data, one of `OK`, `WARNING`, `CRITICAL`
+      - `health_check.value` - comparison value when `health_check.type` is `exact`
+      - `health_check.min`, `health_check.max` - range for comparison when `health_check.type` is `range`
+      - `health_check.troubleshoot` - optional string with common troubleshoot information
+      - `health_check.description` - optional string that can describe what is an issue
 
 #### Allowed field types
-|------------|------------|
+---------------------------
 |   type     |    size    |
 |------------|------------|
 |  uint8_t   |      1     |
@@ -82,4 +87,4 @@ protocol:
 |  double    |      8     |
 |  enum      | 1 (unit8_t)| 
 |  bool      | 1 (uint8_t)|
-|------------|------------|  
+---------------------------  
