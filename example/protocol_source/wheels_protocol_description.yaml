@@ -1,22 +1,24 @@
 protocol:
   subsystem: wheels
   subsystem_id: 1
+  multiple_devices: true
   frames:
-    - name: WheelsStatusFrame
+    - name: wheels_status
       frame_id: 12
       subsystem: wheels
       fields:
-        - name: controller_id
-          type: uint8_t
         - name: driver_status
           type: uint8_t
+          default: "15"
           health_checks:
             - type: exact
               value: 0
               result: OK
+              description: "Driver is ready"
             - type: exact
               value: 255
               result: CRITICAL
+              description: "Driver is not ready"
         - name: temperature
           type: float
           health_checks:
@@ -24,14 +26,24 @@ protocol:
               min: 0
               max: 100
               result: OK
+              description: "Temperature is normal"
             - type: range
               min: 100
               max: 200
               result: WARNING
+              description: "Temperature is high"
             - type: range
               min: 200
               max: 300
               result: CRITICAL
+              description: "Temperature is very high"
         - name: algorithm_type
           type: enum
           values: [POSITION, VELOCITY, TORQUE]
+        - name: algorithm_type2
+          type: enum
+          default: VELOCITY
+          values: [ POSITION: 1, VELOCITY: 2, TORQUE: 3]
+        - name: testbool
+          type: bool
+          default: "true"

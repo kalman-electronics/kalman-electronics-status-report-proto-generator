@@ -1,0 +1,30 @@
+#ifndef KALMAN_STATUS_REPORT_COMMON_H_
+#define KALMAN_STATUS_REPORT_COMMON_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
+// Include standard libraries
+{%- for clib in clibraries %}
+#include <{{ clib }}>
+{%- endfor %}
+
+// Include user libraries
+{%- for lib in libraries %}
+#include "{{ lib }}"
+{%- endfor %}
+
+// Enum for ID of each subsystem
+// ASSUMPTION: values won't exceed 255
+typedef enum {
+    {%- for protocol in protocols %}
+    KSRP_{{ protocol.subsystem | upper }}_SUBSYSTEM_ID = {{ protocol.subsystem_id }},
+    {%- endfor %}
+} KSRP_SubsystemID;
+
+#ifdef __cplusplus
+}
+#endif // __cplusplus
+
+#endif // KALMAN_STATUS_REPORT_COMMON_H_

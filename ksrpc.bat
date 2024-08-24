@@ -1,0 +1,1 @@
+python proto_compiler.py -s protocol_source -o out

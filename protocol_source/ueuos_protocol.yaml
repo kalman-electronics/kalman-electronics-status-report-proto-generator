@@ -1,0 +1,27 @@
+protocol:
+  subsystem: ueuos
+  subsystem_id: 5
+  frames:
+    - name: can_status
+      frame_id: 1
+      fields:
+        - name: tcan_interrupt0
+          type: uint8_t
+          default: "0"
+        - name: tcan_interrupt1
+          type: uint8_t
+          default: "0"
+        - name: tcan_interrupt2
+          type: uint8_t
+          default: "0"
+        - name: tcan_interrupt3
+          type: uint8_t
+          default: "0"
+
+    - name: led_status
+      frame_id: 2
+      fields:
+        - name: mode
+          type: enum
+          values: ["OFF", "AUTONOMY", "READY", "MANUAL", "CUSTOM"]
+

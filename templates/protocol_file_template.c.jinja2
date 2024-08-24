@@ -1,0 +1,312 @@
+/**
+ * @file {{ protocol.subsystem }}_status_report.c
+ * @brief Status report protocol implementation for {{ protocol.subsystem }} subsystem
+ */
+{%- macro snake_to_camel(snake_case_str) -%}
+    {{ snake_case_str |  replace('_', ' ') | title | replace('_', '') | replace(' ', '') }}
+{%- endmacro -%}
+
+// Include standard libraries
+{%- for clib in clibraries %}
+#include <{{ clib }}>
+{%- endfor %}
+
+// Include user libraries
+{%- for lib in libraries %}
+#include "{{ lib }}"
+{%- endfor %}
+
+{% for frame in protocol.frames -%}
+{%- set define_unique_id = protocol.subsystem | upper ~ '_' ~ frame.name | upper%}
+{%- set frame_unique_id = snake_to_camel(protocol.subsystem) ~ '_' ~ snake_to_camel(frame.name) %}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// {{ snake_to_camel(frame.name | upper) }} Frame
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/** @defgroup {{ snake_to_camel(frame.name) }} frame protocol
+ *  @{
+ */
+
+{%- set frame_type = 'KSRP_' ~ frame_unique_id~ '_Frame' %}
+
+/**
+ * @brief Check if a type ID is an instance of {{ snake_to_camel(frame.name) }} frame
+ *
+ * @param type_id The type ID to check
+ * @return true if the type ID is an instance of {{ snake_to_camel(frame.name) }} frame
+ */
+bool KSRP_IsTypeIDInstanceof_{{ frame_unique_id }}(KSRP_TypeID type_id) {
+    return type_id == KSRP_{{ define_unique_id }}_TYPE_ID;
+}
+
+/**
+ * @brief Check if a raw data frame is an instance of {{ snake_to_camel(frame.name) }} frame
+ *
+ * @param raw_data The raw data frame to check
+ * @return true if the raw data frame is an instance of {{ snake_to_camel(frame.name) }} frame
+ */
+bool KSRP_IsRawDataInstanceof_{{ frame_unique_id }}(const KSRP_RawData_Frame* raw_data) {
+    return raw_data->length == sizeof({{ frame_type }}) + KSRP_ID_BYTES &&
+        KSRP_IsTypeIDInstanceof_{{ frame_unique_id }}(KSRP_MAKE_TYPE_ID(raw_data->data[0], raw_data->data[1]));
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+/// {{ snake_to_camel(frame.name | upper) }} Frame Construction
+/////////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Initialize a {{ frame.name | upper }} frame
+ *
+ * @param frame The frame to initialize
+ * @return KSRP_Status KSRP_STATUS_OK if the frame was initialized successfully
+ */
+_nonnull_
+KSRP_Status KSRP_Init_{{ frame_unique_id }}_Frame({{ frame_type }}* frame) {
+    memset(frame, 0, sizeof({{ frame_type }}));
+
+    {%- for field in frame.fields %}
+        {%- if field.default != none  %}
+            {%- if field.is_enum %}
+    frame->{{ field.name }} = ({{ field.type }}_TypeDef) KSRP_{{ define_unique_id }}_{{ field.name | upper}}_{{ field.default }};
+            {%- elif field.is_type_cast %}
+    frame->{{ field.name }} = (KSRP_{{ frame_unique_id }}_{{ snake_to_camel(field.name) }}_TypeDef){{ field.default }};
+            {%- else %}
+    frame->{{ field.name }} = {{ field.default }};
+            {%- endif  %}
+        {%- endif %}
+    {%-endfor %}
+
+    return KSRP_STATUS_OK;
+}
+
+/**
+ * @brief Deserialize a raw data frame into a {{ frame.name | upper }} frame
+ *
+ * @param raw_data The raw data frame to unpack
+ * @param frame The frame to unpack into
+ * @return KSRP_Status KSRP_STATUS_OK if the frame was unpacked successfully
+ */
+_nonnull_
+KSRP_Status KSRP_Unpack_{{ frame_unique_id }}(const KSRP_RawData_Frame* raw_data, {{ frame_type }}* frame) {
+    if (raw_data->length != sizeof({{ frame_type }}) + KSRP_ID_BYTES) {
+        return KSRP_STATUS_INVALID_DATA_SIZE;
+    }
+
+    if (!KSRP_IsRawDataInstanceof_{{ frame_unique_id }}(raw_data)) {
+        return KSRP_STATUS_INVALID_FRAME_TYPE;
+    }
+    {% for field in frame.fields %}
+        {%- if field.actual_size == 1 %}
+            {%- if field.is_enum %}
+    frame->{{ field.name }} = ({{ field.type }}_TypeDef)raw_data->data[{{ field.offset }} + KSRP_ID_BYTES];
+            {%- elif field.is_type_cast %}
+    frame->{{ field.name }} = (KSRP_{{ frame_unique_id }}_{{ snake_to_camel(field.name) }}_TypeDef)raw_data->data[{{ field.offset }} + KSRP_ID_BYTES];
+            {%- elif field.type != 'uint8_t'  %}
+    frame->{{ field.name }} = ({{ field.type }})raw_data->data[{{ field.offset }} + KSRP_ID_BYTES];
+            {%- else %}
+    frame->{{ field.name }} = raw_data->data[{{ field.offset }} + KSRP_ID_BYTES];
+            {%- endif %}
+        {%- elif field.is_type_cast %}
+    frame->{{ field.name }} = *((KSRP_{{ frame_unique_id }}_{{ snake_to_camel(field.name) }}_TypeDef*)&raw_data->data[{{ field.offset }} + KSRP_ID_BYTES]);
+        {%- else %}
+    frame->{{ field.name }} = *(({{ field.type }}*)&raw_data->data[{{ field.offset }} + KSRP_ID_BYTES]);
+        {%- endif  %}
+    {%- endfor %}
+
+    return KSRP_STATUS_OK;
+}
+
+/**
+ * @brief Serialize a {{ frame.name | upper }} frame into a raw data frame
+ *
+ * @param frame The frame to pack
+ * @param raw_data The raw data frame to pack into
+ * @return KSRP_Status KSRP_STATUS_OK if the frame was packed successfully
+ */
+_nonnull_
+KSRP_Status KSRP_Pack_{{ frame_unique_id }}(const {{ frame_type }}* frame, KSRP_RawData_Frame* raw_data) {
+    if (KSRP_MAX_FRAME_SIZE < sizeof({{ frame_type }})) {
+        return KSRP_STATUS_INVALID_DATA_SIZE;
+    }
+
+    raw_data->data[0] = KSRP_{{ protocol.subsystem | upper }}_SUBSYSTEM_ID;
+    raw_data->data[1] = KSRP_{{ define_unique_id }}_FRAME_ID;
+    {% for field in frame.fields %}
+        {%- if field.actual_size == 1 %}
+            {%- if field.is_enum %}
+    raw_data->data[{{ field.offset }} + KSRP_ID_BYTES] = (uint8_t)frame->{{ field.name }};
+            {%- elif field.is_type_cast %}
+    raw_data->data[{{ field.offset }} + KSRP_ID_BYTES] = (uint8_t)frame->{{ field.name }};
+            {%- elif field.type != 'uint8_t'  %}
+    raw_data->data[{{ field.offset }} + KSRP_ID_BYTES] = (uint8_t)frame->{{ field.name }};
+            {%- else %}
+    raw_data->data[{{ field.offset }} + KSRP_ID_BYTES] = frame->{{ field.name }};
+            {%- endif %}
+        {%- elif field.is_type_cast %}
+    *((KSRP_{{ frame_unique_id }}_{{ snake_to_camel(field.name) }}_TypeDef*)&raw_data->data[{{ field.offset }} + KSRP_ID_BYTES]) = frame->{{ field.name }};
+        {%- else %}
+    *(({{ field.type }}*)&raw_data->data[{{ field.offset }} + KSRP_ID_BYTES]) = frame->{{ field.name }};
+        {%- endif  %}
+    {%- endfor %}
+
+    raw_data->length = sizeof({{ frame_type }}) + KSRP_ID_BYTES;
+
+    return KSRP_STATUS_OK;
+}
+
+/**
+ * @brief Compare two {{ frame.name | upper }} frames
+ *
+ * @param frame1 The first frame to compare
+ * @param frame2 The second frame to compare
+ * @return int 0 if the frames are equal, -1 if frame1 is less than frame2, 1 if frame1 is greater than frame2
+ */
+int KSRP_{{ frame_unique_id }}_Frame_Compare(const {{ frame_type }}* frame1, const {{ frame_type }}* frame2) {
+    if (frame1 == frame2) return 0;
+    if (frame1 == NULL) return -1;
+    if (frame2 == NULL) return 1;
+
+    {%- for field in frame.fields %}
+        {%- if field.is_type_cast %}
+    if (frame1->{{ field.name }} < frame2->{{ field.name }}) {
+        return -1;
+    } else if (frame1->{{ field.name }} > frame2->{{ field.name }}) {
+        return 1;
+    }
+        {%- else %}
+    if (frame1->{{ field.name }} < frame2->{{ field.name }}) {
+        return -1;
+    } else if (frame1->{{ field.name }} > frame2->{{ field.name }}) {
+        return 1;
+    }
+        {%- endif %}
+    {%- endfor %}
+
+    return 0;
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+/// {{ snake_to_camel(frame.name | upper) }} Setters
+/////////////////////////////////////////////////////////////////////////////////
+{%- for field in frame.fields %}
+/**
+ * @brief Set the value of {{ field.name }} in a {{ frame.name | upper }} frame
+ *
+ * @param frame The frame to set the value in
+ * @param value The value to set
+ */
+_nonnull_
+void KSRP_Set_{{ frame_unique_id}}_{{ snake_to_camel(field.name) }}({{ frame_type }}* frame, {{ field.type }} value) {
+    {%- if field.is_type_cast %}
+    frame->{{ field.name }} = ({{ field.cast_type }})value;
+    {%- else %}
+    frame->{{ field.name }} = value;
+    {%- endif  %}
+}
+{% endfor %}
+
+/////////////////////////////////////////////////////////////////////////////////
+/// {{ snake_to_camel(frame.name | upper) }} Getters
+/////////////////////////////////////////////////////////////////////////////////
+{%- for field in frame.fields %}
+/**
+ * @brief Get the value of {{ field.name }} in a {{ frame.name | upper }} frame
+ *
+ * @param frame The frame to get the value from
+ * @return The value of {{ field.name }}
+ */
+_nonnull_
+{{ field.type }} KSRP_Get_{{ frame_unique_id}}_{{ snake_to_camel(field.name) }}(const {{ frame_type }}* frame) {
+{%- if field.is_type_cast %}
+    return ({{ field.type }})frame->{{ field.name }};
+{%- else %}
+    return frame->{{ field.name }};
+{%- endif  %}
+}
+{% endfor %}
+
+/////////////////////////////////////////////////////////////////////////////////
+/// {{ snake_to_camel(frame.name | upper) }} Health Checks
+/////////////////////////////////////////////////////////////////////////////////
+{%- for field in frame.fields if field.is_health_check %}
+/**
+ * @brief Perform health check on {{ field.name }} in {{ frame.name | upper }} frame
+ *
+ * @param frame The frame to check
+ * @return KSRP_HealthCheckResult The result of the health check
+ */
+_nonnull_
+KSRP_HealthCheckResult KSRP_HealthCheckResult_{{ frame_unique_id }}_{{ snake_to_camel(field.name) }}(const {{ frame_type }}* frame) {
+    {%- for health_check in field.health_checks %}
+        {%- if health_check.type == 'exact' %}
+    if (frame->{{ field.name }} == KSRP_{{ define_unique_id }}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}) {
+        return KSRP_RESULT_{{ health_check.result | upper }};
+    }
+        {%- elif health_check.type == 'range' %}
+    if (frame->{{ field.name }} >= KSRP_{{ define_unique_id }}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}_MIN
+            && frame->{{ field.name }} < KSRP_{{ define_unique_id }}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}_MAX) {
+        return KSRP_RESULT_{{ health_check.result | upper }};
+    }
+        {%- endif %}
+    {%- endfor %}
+    return KSRP_RESULT_UNKNOWN;
+}
+{% endfor %}
+
+{%- for field in frame.fields if field.is_health_check %}
+/**
+ * @brief Get the troubleshooting description for the health check on {{ field.name }} in {{ frame.name | upper }} frame
+ *
+ * @param frame The frame to check
+ * @return const char* The troubleshooting description
+ */
+_nonnull_
+const char* KSRP_HealthCheckTroubleshoot_{{ frame_unique_id }}_{{ snake_to_camel(field.name) }}(const {{ frame_type }}* frame) {
+    {%- for health_check in field.health_checks %}
+        {%- if health_check.troubleshoot != none %}
+            {%- if health_check.type == 'exact' %}
+    if (frame->{{ field.name }} ==KSRP_{{ define_unique_id }}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}) {
+        return KSRP_{{ define_unique_id }}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}_TROUBLESHOOT;
+    }
+            {%- elif health_check.type == 'range' %}
+    if (frame->{{ field.name }} >= KSRP_{{ define_unique_id }}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}_MIN
+            && frame->{{ field.name }} < KALMAN_STATUS_{{frame.name | upper}}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}_MAX) {
+        return KSRP_{{ define_unique_id }}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}_TROUBLESHOOT;
+    }    
+            {%- endif %}
+        {%- endif %}
+    {%- endfor %}
+    return "Unknown troubleshoot";
+}
+{% endfor -%}
+
+{%- for field in frame.fields if field.is_health_check %}
+/**
+ * @brief Get the description for the health check on {{ field.name }} in {{ frame.name | upper }} frame
+ *
+ * @param frame The frame to check
+ * @return const char* The description
+ */
+_nonnull_
+const char* KSRP_HealthCheckDescription_{{ frame_unique_id }}_{{ snake_to_camel(field.name) }}(const {{ frame_type }}* frame) {
+    {%- for health_check in field.health_checks %}
+        {%- if health_check.description != none %}
+            {%- if health_check.type == 'exact' %}
+    if (frame->{{ field.name }} == KSRP_{{ define_unique_id }}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}) {
+        return KSRP_{{ define_unique_id }}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}_DESCRIPTION;
+    }
+            {%- elif health_check.type == 'range' %}
+    if (frame->{{ field.name }} >= KSRP_{{ define_unique_id }}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}_MIN
+            && frame->{{ field.name }} < KSRP_{{ define_unique_id }}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}_MAX) {
+        return KSRP_{{ define_unique_id }}_{{field.name | upper}}_HEALTH_CHECK_{{health_check.result | upper}}_{{ loop.index0 + 1}}_DESCRIPTION;
+    }    
+            {%- endif %}
+        {%- endif %}
+    {%- endfor %}
+    return "Unknown description";
+}
+{% endfor -%}
+
+/**
+ * @}
+ */
+
+{% endfor %}

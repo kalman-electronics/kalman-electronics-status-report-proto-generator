@@ -1,0 +1,34 @@
+/**
+ * @file protocol_util.h
+ * @brief Utility functions for the Kalman Status Report protocol
+ */
+#ifndef KALMAN_STATUS_REPORT_UTIL_H_
+#define KALMAN_STATUS_REPORT_UTIL_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
+// Include standard libraries
+{%- for clib in clibraries %}
+#include <{{ clib }}>
+{%- endfor %}
+
+// Include user libraries
+{%- for lib in libraries %}
+#include "{{ lib }}"
+{%- endfor %}
+
+/**
+ * @brief Verify the type ID of a frame
+ *
+ * @param frame The frame to verify
+ * @return KSRP_TypeID The type ID of the frame
+ */
+KSRP_TypeID KSRP_VerifyTypeID(const KSRP_RawData_Frame* frame);
+
+#ifdef __cplusplus
+}
+#endif // __cplusplus
+
+#endif // KALMAN_STATUS_REPORT_UTIL_H_
