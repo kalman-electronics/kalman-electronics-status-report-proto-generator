@@ -157,7 +157,7 @@ All code generted by compiler has `KSRP` prefix to avoid interference with other
 
 Docs about particular methods you can find in form of doxygen comments. 
 
-You can find example of generated code in `example/out` directory.
+You can find example of generated code in `example/example_out` directory.
 
 ## Including to project (CMake)
 To include library to project using CMake, easiest way is to use FetchContent. Example cmake:
