@@ -14,7 +14,7 @@
 python proto_compiler.py [-h] [-s SOURCE] [-o OUTPUT] [-t TEMPLATES]
 ```
 
-For convinience I have created bash files for runing compiler.
+For convinience I have created bash files for runing compiler: ksrpc.bat (for windows) and ksrpc.sh (for linux).
 
 ### Create release 
 Repository contains github action that creates automatic releases when pushing git tag. It runs compiler script and creates zip file with output library code named `protocol.zip`. You can get latest from [here](https://github.com/kalman-electronics/kalman-electronics-status-report-proto-generator/releases/latest/download/protocol.zip)
