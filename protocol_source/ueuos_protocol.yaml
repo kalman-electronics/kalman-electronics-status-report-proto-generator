@@ -14,7 +14,7 @@ protocol:
         - name: tcan_interrupt2
           type: uint8_t
           default: "0"
-        - name: tcan_interrupt3
+        - name: tcan_interrupt_can_bus
           type: uint8_t
           default: "0"
 
@@ -25,3 +25,5 @@ protocol:
           type: enum
           values: ["OFF", "AUTONOMY", "READY", "MANUAL", "CUSTOM"]
 
+        - name: errors
+          type: uint8_t
